@@ -1,0 +1,2882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YTT Anatomy</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#faf7f2">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="YTT Anatomy">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@300;400;500&display=swap');
+
+:root {
+  --sf-charcoal: #1c1a18;
+  --sf-warm:     #2c2820;
+  --sf-ember:    #c4632e;
+  --sf-ember-dk: #a8521f;
+  --sf-ash:      #8a8278;
+  --sf-cream:    #f5f0e8;
+  --sf-light:    #faf7f2;
+  --sf-mid:      #e8e0d4;
+}
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Jost', sans-serif;
+    font-weight: 300;
+    background: var(--sf-light);
+    color: var(--sf-charcoal);
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 20px;
+  }
+  .container { width: 100%; max-width: 720px; }
+  header {
+    background: var(--sf-charcoal);
+    color: var(--sf-cream);
+    border-radius: 4px 4px 0 0;
+    padding: 22px 24px 18px;
+  }
+  header h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300; font-size: 1.4rem;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    margin-bottom: 12px; color: var(--sf-cream);
+  }
+  .stats { display: flex; gap: 20px; font-size: 0.78rem; letter-spacing: 0.06em; opacity: 0.65; }
+  .progress-bar { height: 1px; background: rgba(255,255,255,0.15); margin-top: 14px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--sf-ember); transition: width 0.4s ease; }
+  .card {
+    background: var(--sf-cream);
+    border-radius: 0 0 4px 4px;
+    padding: 28px 24px;
+    border: 0.5px solid var(--sf-mid);
+    border-top: none;
+  }
+  .question-meta {
+    font-size: 0.72rem; color: var(--sf-ash); margin-bottom: 14px;
+    display: flex; justify-content: flex-start; align-items: center;
+    letter-spacing: 0.15em; text-transform: uppercase;
+  }
+  .retry-badge {
+    font-size: 0.68rem; font-weight: 400; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--sf-ember); border: 0.5px solid var(--sf-ember);
+    padding: 2px 8px; border-radius: 2px;
+  }
+  .question-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 400; font-size: 1.25rem;
+    line-height: 1.5; margin-bottom: 22px;
+    color: var(--sf-warm); letter-spacing: 0.02em;
+  }
+  .options { display: flex; flex-direction: column; gap: 7px; }
+  .option {
+    padding: 11px 15px; border: 0.5px solid var(--sf-mid); border-radius: 2px;
+    cursor: pointer; font-size: 0.88rem; line-height: 1.5; letter-spacing: 0.03em;
+    font-weight: 300; transition: all 0.15s; background: var(--sf-light); text-align: left;
+    color: var(--sf-warm);
+  }
+  .option:hover:not(:disabled) { border-color: var(--sf-ember); background: var(--sf-cream); }
+  .option.correct { border: 2px solid #5a8a5a; background: #f2f7f2; color: #2a4a2a; font-weight: 400; }
+  .option.incorrect { border: 2px solid #b85555; background: #faf2f2; color: #5a2a2a; }
+  .option.reveal { border: 2px solid #5a8a5a; background: #f2f7f2; color: #2a4a2a; }
+  .option:disabled { cursor: default; }
+  .feedback {
+    margin-top: 14px; padding: 11px 15px; border-radius: 2px;
+    font-size: 0.85rem; line-height: 1.6; display: none; letter-spacing: 0.02em; font-weight: 300;
+  }
+  .feedback.correct { background: #f2f7f2; color: #2a4a2a; border: 0.5px solid #a8c8a8; }
+  .feedback.incorrect { background: #faf2f2; color: #5a2a2a; border: 0.5px solid #d8a8a8; }
+  .next-btn {
+    margin-top: 16px; width: 100%; padding: 12px;
+    background: var(--sf-ember); color: var(--sf-cream); border: none; border-radius: 2px;
+    font-family: 'Jost', sans-serif; font-size: 0.78rem; font-weight: 400;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    cursor: pointer; display: none; transition: background 0.15s;
+  }
+  .next-btn:hover { background: var(--sf-ember-dk); }
+
+  /* Start screen */
+  #start-screen .card { border-radius: 4px; border-top: 0.5px solid var(--sf-mid); }
+  #start-screen header { border-radius: 4px 4px 0 0; }
+  .start-subtitle {
+    color: var(--sf-ash); font-size: 0.78rem; letter-spacing: 0.06em;
+    margin-bottom: 24px; font-weight: 300;
+  }
+  .all-btn {
+    width: 100%; padding: 14px; background: var(--sf-ember); color: var(--sf-cream);
+    border: none; border-radius: 2px;
+    font-family: 'Jost', sans-serif; font-size: 0.78rem; font-weight: 400;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    cursor: pointer; transition: background 0.15s; margin-bottom: 28px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .all-btn:hover { background: var(--sf-ember-dk); }
+  .section-heading {
+    font-size: 0.68rem; font-weight: 500; text-transform: uppercase;
+    letter-spacing: 0.3em; color: var(--sf-ash); margin-bottom: 12px;
+  }
+  .topic-grid { display: flex; flex-direction: column; gap: 5px; }
+  .topic-btn {
+    width: 100%; padding: 10px 14px; background: var(--sf-light);
+    border: 0.5px solid var(--sf-mid); border-radius: 2px;
+    cursor: pointer; font-size: 0.85rem; font-weight: 300; letter-spacing: 0.02em;
+    text-align: left; transition: all 0.15s; display: flex; justify-content: space-between; align-items: center;
+    color: var(--sf-warm);
+  }
+  .topic-btn:hover { border-color: var(--sf-ember); background: var(--sf-cream); }
+  .topic-btn .count { font-size: 0.72rem; color: var(--sf-ash); white-space: nowrap; letter-spacing: 0.04em; }
+
+  /* Results screen */
+  #results-screen { display: none; }
+  #results-screen .card { border-radius: 4px; border-top: 0.5px solid var(--sf-mid); text-align: center; }
+  .result-emoji { font-size: 3rem; margin-bottom: 14px; }
+  .result-score {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 3rem; font-weight: 300; color: var(--sf-ember);
+    letter-spacing: 0.04em; margin-bottom: 6px;
+  }
+  .result-label { font-size: 0.85rem; color: var(--sf-ash); margin-bottom: 24px; font-weight: 300; letter-spacing: 0.04em; }
+  .result-breakdown { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 24px; }
+  .result-stat { background: var(--sf-light); border: 0.5px solid var(--sf-mid); border-radius: 2px; padding: 12px; }
+  .result-stat .val { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 300; color: var(--sf-charcoal); }
+  .result-stat .lbl { font-size: 0.68rem; color: var(--sf-ash); margin-top: 2px; letter-spacing: 0.15em; text-transform: uppercase; }
+  .result-buttons { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .restart-btn {
+    padding: 11px 28px; background: var(--sf-ember); color: var(--sf-cream);
+    border: none; border-radius: 2px;
+    font-family: 'Jost', sans-serif; font-size: 0.78rem; font-weight: 400;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    cursor: pointer; transition: background 0.15s;
+  }
+  .restart-btn:hover { background: var(--sf-ember-dk); }
+  .menu-btn {
+    padding: 11px 28px; background: transparent; color: var(--sf-charcoal);
+    border: 0.5px solid var(--sf-mid); border-radius: 2px;
+    font-family: 'Jost', sans-serif; font-size: 0.78rem; font-weight: 400;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .menu-btn:hover { border-color: var(--sf-charcoal); background: var(--sf-light); }
+
+  /* Overall stats panel */
+  .overall-stats-panel { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+  .stat-chip {
+    flex: 1 1 calc(25% - 8px); min-width: 90px; background: var(--sf-light);
+    border: 0.5px solid var(--sf-mid); border-radius: 2px; padding: 10px 12px;
+    display: flex; flex-direction: column; align-items: center;
+    font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--sf-ash); text-align: center; gap: 3px;
+  }
+  .stat-chip .chip-val {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem; font-weight: 300; color: var(--sf-charcoal); line-height: 1.1;
+  }
+  .no-sessions-msg {
+    font-size: 0.8rem; color: var(--sf-ash); text-align: center; font-weight: 300;
+    letter-spacing: 0.04em; margin-bottom: 20px; padding: 12px;
+    background: var(--sf-light); border: 0.5px solid var(--sf-mid); border-radius: 2px;
+  }
+
+  /* Traffic light dots */
+  .tl-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; flex-shrink: 0; margin-right: 8px; }
+  .tl-grey  { background: var(--sf-mid); }
+  .tl-red   { background: #b85555; }
+  .tl-amber { background: #c4832e; }
+  .tl-green { background: #5a8a5a; }
+  .tl-star  { color: #c8900a; font-size: 0.85rem; line-height: 1; flex-shrink: 0; margin-right: 8px; display: inline-block; }
+
+  /* First-attempt sub-score on results screen */
+  #result-first-attempt {
+    font-size: 0.8rem; color: var(--sf-ash); font-weight: 300;
+    letter-spacing: 0.04em; margin-bottom: 16px; margin-top: -10px;
+  }
+
+  /* Topic button inner layout */
+  .topic-btn-name { flex: 1; text-align: left; }
+  .topic-score { font-size: 0.72rem; font-weight: 400; color: var(--sf-ember); white-space: nowrap; margin-right: 10px; letter-spacing: 0.03em; }
+  .topic-score.not-started { color: var(--sf-ash); font-weight: 300; }
+
+  /* Retry round banner */
+  .retry-banner {
+    border-radius: 2px; padding: 5px 12px; font-size: 0.72rem; margin-top: 10px;
+    border-left: 2px solid var(--sf-ember); color: var(--sf-ash);
+    letter-spacing: 0.08em; background: rgba(255,255,255,0.05);
+  }
+
+  /* Results topic breakdown */
+  .results-topic-breakdown { margin-bottom: 20px; text-align: left; }
+  .rtb-heading {
+    font-size: 0.68rem; font-weight: 500; text-transform: uppercase;
+    letter-spacing: 0.3em; color: var(--sf-ash); margin-bottom: 10px;
+  }
+  .rtb-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 0; border-bottom: 0.5px solid var(--sf-mid); font-size: 0.85rem; font-weight: 300;
+    color: var(--sf-warm);
+  }
+  .rtb-name { flex: 1; }
+  .rtb-pct { font-weight: 400; min-width: 38px; text-align: right; letter-spacing: 0.03em; }
+  .rtb-pct.pct-green { color: #5a8a5a; }
+  .rtb-pct.pct-amber { color: #c4832e; }
+  .rtb-pct.pct-red   { color: #b85555; }
+
+  /* Back button in quiz header */
+  .header-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .header-top h1 { margin-bottom: 0; }
+  .back-arrow-btn {
+    background: none; border: none; cursor: pointer; padding: 0;
+    color: rgba(245,240,232,0.55); line-height: 1; flex-shrink: 0;
+    transition: color 0.15s; font-size: 1.1rem;
+  }
+  .back-arrow-btn:hover { color: var(--sf-cream); }
+
+  /* Quit confirmation modal */
+  #quit-modal {
+    display: none; position: fixed; inset: 0;
+    background: rgba(28,26,24,0.65); z-index: 100;
+    align-items: center; justify-content: center; padding: 20px;
+  }
+  #quit-modal.open { display: flex; }
+  .quit-modal-card {
+    background: var(--sf-cream); border-radius: 4px;
+    border: 0.5px solid var(--sf-mid); padding: 28px 24px;
+    max-width: 360px; width: 100%; text-align: center;
+  }
+  .quit-modal-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.2rem; font-weight: 400; color: var(--sf-warm);
+    letter-spacing: 0.04em; margin-bottom: 8px;
+  }
+  .quit-modal-body {
+    font-size: 0.82rem; color: var(--sf-ash); font-weight: 300;
+    letter-spacing: 0.03em; line-height: 1.6; margin-bottom: 22px;
+  }
+  .quit-modal-btns { display: flex; gap: 10px; justify-content: center; }
+
+  /* Mock papers section */
+  .mock-grid { display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px; }
+  .mock-btn {
+    width: 100%; padding: 10px 14px; background: var(--sf-light);
+    border: 0.5px solid var(--sf-mid); border-radius: 2px;
+    cursor: pointer; font-size: 0.85rem; font-weight: 300; letter-spacing: 0.02em;
+    text-align: left; transition: all 0.15s; display: flex; align-items: center;
+    color: var(--sf-warm);
+  }
+  .mock-btn:hover { border-color: var(--sf-ember); background: var(--sf-light); }
+  .mock-btn-name { flex: 1; font-weight: 400; }
+  .mock-score { font-size: 0.72rem; font-weight: 400; color: var(--sf-ember); white-space: nowrap; margin-right: 10px; letter-spacing: 0.03em; }
+  .mock-score.not-started { color: var(--sf-ash); font-weight: 300; }
+  .mock-score.passed { color: #5a8a5a; }
+  .mock-score.failed { color: #b85555; }
+  .mock-count { font-size: 0.72rem; color: var(--sf-ash); white-space: nowrap; letter-spacing: 0.04em; }
+  /* Pass/fail badge on results screen */
+  .pass-badge {
+    display: inline-block; padding: 5px 16px; border-radius: 2px;
+    font-size: 0.72rem; font-weight: 400; letter-spacing: 0.2em;
+    text-transform: uppercase; margin-bottom: 16px;
+  }
+  .pass-badge.pass { background: #f2f7f2; color: #2a4a2a; border: 0.5px solid #a8c8a8; }
+  .pass-badge.fail { background: #faf2f2; color: #5a2a2a; border: 0.5px solid #d8a8a8; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- START SCREEN -->
+  <div id="start-screen">
+    <header>
+      <h1>Anatomy &amp; Physiology</h1>
+    </header>
+    <div class="card">
+      <p class="start-subtitle">302 questions across 25 topics — YMCA Level 3 Applied Anatomy &amp; Physiology</p>
+      <div id="overall-stats-panel"></div>
+      <button class="all-btn" id="all-btn" onclick="startAll()">Practice All 302 Questions</button>
+      <div class="section-heading">Official Mock Papers</div>
+      <div class="mock-grid" id="mock-grid"></div>
+      <div class="section-heading" style="margin-top:28px">Or choose a topic</div>
+      <div class="topic-grid" id="topic-grid"></div>
+    </div>
+  </div>
+
+  <!-- QUIT MODAL -->
+  <div id="quit-modal">
+    <div class="quit-modal-card">
+      <div class="quit-modal-title">Leave this session?</div>
+      <div class="quit-modal-body">Your progress in this session will be lost.</div>
+      <div class="quit-modal-btns">
+        <button class="menu-btn" onclick="closeQuitModal()">Stay</button>
+        <button class="restart-btn" onclick="confirmQuit()">Leave</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUIZ SCREEN -->
+  <div id="quiz-screen" style="display:none">
+    <header>
+      <div class="header-top">
+        <button class="back-arrow-btn" onclick="openQuitModal()" aria-label="Back to menu">&#8592;</button>
+        <h1 id="quiz-title">YTT Anatomy &amp; Physiology Quiz</h1>
+      </div>
+      <div class="stats">
+        <div>Question <span id="q-current">1</span> of <span id="q-total">—</span></div>
+        <div>Score <span id="q-score">0</span></div>
+      </div>
+      <div id="retry-banner" class="retry-banner" style="display:none">Retry round — revisiting your wrong answers</div>
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+    </header>
+    <div class="card">
+      <div class="question-meta" id="retry-meta" style="display:none">
+        <span id="retry-badge" class="retry-badge">Retry</span>
+      </div>
+      <div class="question-text" id="q-text"></div>
+      <div class="options" id="options-container"></div>
+      <div class="feedback" id="feedback"></div>
+      <button class="next-btn" id="next-btn" onclick="nextQuestion()">Next Question →</button>
+    </div>
+  </div>
+
+  <!-- RESULTS SCREEN -->
+  <div id="results-screen">
+    <div class="card" style="border-radius:12px">
+      <div class="result-emoji" id="result-emoji">🌿</div>
+      <div class="result-score" id="result-score"></div>
+      <div class="result-label" id="result-label"></div>
+      <div id="result-first-attempt" style="display:none"></div>
+      <div class="result-breakdown">
+        <div class="result-stat"><div class="val" id="res-correct" style="color:#38a169"></div><div class="lbl">Correct</div></div>
+        <div class="result-stat"><div class="val" id="res-incorrect" style="color:#e53e3e"></div><div class="lbl">Incorrect</div></div>
+        <div class="result-stat"><div class="val" id="res-total"></div><div class="lbl">Questions</div></div>
+      </div>
+      <div id="result-pass-badge" style="display:none"></div>
+      <div id="results-topic-breakdown" class="results-topic-breakdown" style="display:none"></div>
+      <div class="result-buttons">
+        <button class="menu-btn" onclick="goToMenu()">Back to Menu</button>
+        <button class="restart-btn" onclick="restartQuiz()">Try Again</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="clear-progress-wrap" style="text-align:center;margin-top:12px;display:none">
+    <button onclick="clearProgress()" style="background:none;border:none;color:#a0aec0;font-size:0.78rem;cursor:pointer;padding:4px 0;text-decoration:underline">Clear all progress</button>
+  </div>
+
+</div>
+
+<script>
+const RAW = `Q1. Which of the following correctly describes ankylosing spondylitis?
+a) A condition in children where bony growths narrow the spinal canal
+b) The natural wearing of facet joint cartilage due to age and overuse
+c) A form of arthritis in young adults that causes inflammation, stiffness and potentially vertebral fusion ✓
+d) Bony growths from the intervertebral joints that press on the spinal cord
+
+Q2. Which of the following correctly describes spinal stenosis?
+a) The anterior shift of one vertebra on another, common in adolescent gymnasts
+b) Bony growths from the facet or intervertebral joints that grow into the vertebral canal, often associated with osteoarthritis ✓
+c) Inflammation and stiffness of the lower back caused by a form of arthritis in young adults
+d) Herniation of the disc pressing on nerve roots in the lumbar spine
+
+Q3. What is facet joint dysfunction?
+a) A form of arthritis affecting young adults that can cause vertebrae to fuse together
+b) A condition where the disc becomes more fibrous, loses height, and leads to compression and cartilage damage in the facet joints ✓
+c) A herniation of the intervertebral disc pressing on the spinal cord
+d) An anterior shift of L5 on S1 common in adolescent gymnasts
+
+Q4. Which of the following is the cause of the birth defect achondroplasia?
+a) The bone tissue of the hands and feet do not grow properly
+b) The muscles of the spine do not form correctly
+c) The muscles of the legs and arms do not form correctly
+d) The bone tissue of the leg and arm do not grow properly ✓
+
+Q5. What is spondylolisthesis?
+a) Inflammation of the vertebral joints most common in older people due to wear and tear
+b) Bony outgrowths from the facet joints that narrow the vertebral canal
+c) An anterior shift of one vertebra on another, commonly at L5/S1, often seen in adolescent gymnasts ✓
+d) A form of arthritis affecting the bones, discs and ligaments of the spine
+
+Q6. Which of the following correctly describes a herniated disc?
+a) A lateral bending or twisting of the vertebral column
+b) A bony growth from the facet joints into the vertebral canal
+c) An intervertebral disc that bulges and may press on the spinal cord, causing nerve pain ✓
+d) The anterior shift of one vertebra on another at the L5/S1 junction
+
+Q7. Which of the following is an environmental cause of kyphosis?
+a) Achondroplasia
+b) Congenital kyphosis
+c) Spina bifida
+d) Poor seated or standing posture ✓
+
+Q8. Which of the following could be a cause of the postural deviation hyper-lordosis?
+a) Imbalance of arm and shoulder muscles
+b) Imbalance of chest and shoulder muscles
+c) Imbalance of hip flexors and trunk muscles ✓
+d) Imbalance of leg and arm muscles
+
+Q9. Which of the following correctly describes the role of the rhomboids in correcting kyphosis?
+a) They are tight and overactive and need to be stretched
+b) They are weak and underactive and need to be strengthened through retraction movements ✓
+c) They are tight and overactive and need to be released through protraction movements
+d) They have no role in kyphosis correction
+
+Q10. Which spinal disorder may also be known as 'hunchback'?
+a) Hyper-lordosis
+b) Lower-cross syndrome
+c) Upper-cross syndrome
+d) Hyper-kyphosis ✓
+
+Q11. In kyphosis, which muscles are typically weak, underactive and lengthened?
+a) Pectoralis major and upper trapezius
+b) Middle and lower trapezius, and rhomboids ✓
+c) Hip flexors, erector spinae and quadratus lumborum
+d) Hamstrings, gluteus maximus and transverse abdominis
+
+Q12. Which of the following correctly identifies an environmental cause of lordosis?
+a) Achondroplasia causing short limbs
+b) Spina bifida affecting vertebral structure
+c) Congenital kyphosis where the spinal cord doesn't develop correctly
+d) Increased weight of the abdomen due to obesity or pregnancy ✓
+
+Q13. Which of the following is an environmental cause of scoliosis?
+a) Congenital spinal defect present at birth
+b) Spina bifida affecting vertebral structure
+c) Uneven carrying of load and muscle imbalance ✓
+d) Achondroplasia causing short limbs
+
+Q14. In kyphosis, which muscles are typically tight, overactive and shortened?
+a) Middle and lower trapezius, rhomboids
+b) Hamstrings, gluteus maximus and core
+c) Hip flexors, erector spinae and quadratus lumborum
+d) Pectoralis major and upper trapezius ✓
+
+Q15. Which of the following correctly describes scoliosis and an environmental cause?
+a) Exaggeration of lumbar curve caused by increased abdominal weight
+b) Exaggeration of thoracic curve caused by poor seated posture
+c) Lateral bending or twisting of the vertebral column caused by uneven load carrying ✓
+d) Forward tilting of the pelvis caused by tight hip flexors
+
+Q16. In lordosis, which muscles are typically tight, overactive and shortened?
+a) Hamstrings, gluteus maximus and core
+b) Middle and lower trapezius and rhomboids
+c) Hip flexors, erector spinae and quadratus lumborum ✓
+d) Pectoralis major and upper trapezius
+
+Q17. Which of the following is a genetic cause of kyphosis?
+a) Poor seated posture and unbalanced muscles
+b) Achondroplasia causing short limbs
+c) Deteriorating vertebral discs with age
+d) Spina bifida causing structural changes due to a gap in the vertebrae ✓
+
+Q18. Which of the following correctly describes scoliosis?
+a) An exaggeration of the thoracic curve causing a hunchback appearance
+b) Lateral bending or twisting of the vertebral column ✓
+c) An exaggeration of the lumbar curve causing a swayback appearance
+d) A forward tilting of the pelvis due to tight hip flexors
+
+Q19. Which of the following may occur as a result of poor posture?
+a) Eye problems
+b) Stomach problems
+c) Poor heart function
+d) Poor lung function ✓
+
+Q20. In lordosis, which muscles are typically weak, underactive and lengthened?
+a) Hip flexors, erector spinae and quadratus lumborum
+b) Pectoralis major, upper trapezius
+c) Hamstrings, gluteus maximus and core (TVA and rectus abdominis) ✓
+d) Adductor group and pectineus
+
+Q21. Which muscle is responsible for dorsiflexion and inversion of the ankle?
+a) Gastrocnemius
+b) Soleus
+c) Tibialis anterior ✓
+d) Rectus femoris
+
+Q22. Through which anatomical plane does the leg move when stepping forward in walking?
+a) Frontal
+b) Transverse
+c) Coronal
+d) Sagittal ✓
+
+Q23. A yoga student performing a seated spinal twist is moving primarily through which anatomical plane?
+a) Sagittal plane
+b) Frontal plane
+c) Transverse plane ✓
+d) Coronal plane
+
+Q24. Which anatomical plane divides the body into anterior (front) and posterior (back) sections?
+a) Sagittal plane
+b) Transverse plane
+c) Frontal (coronal) plane ✓
+d) Median plane
+
+Q25. Which anatomical plane divides the body into left and right halves?
+a) Frontal (coronal) plane
+b) Sagittal plane ✓
+c) Transverse plane
+d) Median plane
+
+Q26. Which joint actions occur in the frontal plane?
+a) Flexion and extension
+b) Abduction and adduction ✓
+c) Rotation and pronation
+d) Inversion and circumduction
+
+Q27. Which of the following correctly describes the movement of eversion at the ankle?
+a) Toes pointing downwards through the ankle
+b) Sole of the foot turning inwards
+c) Toes lifting upwards towards the shin
+d) Sole of the foot turning outwards ✓
+
+Q28. What must happen to start a muscle contraction?
+a) Stimulation of the muscle by an actin filament
+b) Stimulation of the muscle by a myosin filament
+c) Stimulation of the muscle by adenosine triphosphate
+d) Stimulation of the muscle by a motor neuron impulse ✓
+
+Q29. According to the sliding filament theory, what happens when a muscle contracts?
+a) Actin and myosin pull on each other and overlap, causing the muscle to shorten ✓
+b) Actin and myosin separate from each other, causing the muscle to lengthen
+c) Actin filaments break down, causing the muscle to relax
+d) Myosin filaments increase in number, causing the muscle to grow
+
+Q30. Within the sliding filament theory, which of the following correctly describes actin and myosin?
+a) Actin is the thick myofilament; myosin is the thin myofilament
+b) Actin is the thin myofilament; myosin is the thick myofilament ✓
+c) Actin and myosin are both thin myofilaments
+d) Actin and myosin are both thick myofilaments
+
+Q31. What is the name of the principle where contracting a muscle on the opposite side to the one being stretched allows a deeper stretch?
+a) Autogenic inhibition
+b) The all-or-none response
+c) The reverse stretch reflex
+d) Reciprocal inhibition ✓
+
+Q32. What is the name given to the protein filaments that make up myofibrils, specifically the thin filament?
+a) Myosin
+b) Collagen
+c) Elastin
+d) Actin ✓
+
+Q33. Which of the following correctly describes the difference between concentric and eccentric contractions?
+a) Concentric = muscle lengthens under tension; Eccentric = muscle shortens under tension
+b) Concentric = no change in muscle length; Eccentric = muscle lengthens under tension
+c) Concentric = muscle shortens under tension; Eccentric = muscle lengthens under tension ✓
+d) Concentric = muscle shortens under tension; Eccentric = no change in muscle length
+
+Q34. What is the name of the principle where isometrically engaging a muscle before stretching it activates the GTO and encourages the muscle to relax?
+a) Reciprocal inhibition
+b) The all-or-none response
+c) The reverse stretch reflex
+d) Autogenic inhibition ✓
+
+Q35. During boat pose (navasana), which muscle is the agonist and which is the synergist for hip flexion?
+a) Iliacus is the agonist; psoas major is the synergist
+b) Rectus femoris is the agonist; psoas major is the synergist
+c) Psoas major is the agonist; iliacus is the synergist ✓
+d) Sartorius is the agonist; psoas major is the synergist
+
+Q36. In mountain pose (tadasana), which muscles should be engaged as fixators to keep the arms in position alongside the body?
+a) Pectoralis major and anterior deltoid
+b) Serratus anterior and rhomboids
+c) Latissimus dorsi and teres major ✓
+d) Trapezius and levator scapulae
+
+Q37. During a plank (kumbhakasana), which muscle is the agonist and which is the synergist in the chest?
+a) Pectoralis minor is the agonist; pectoralis major is the synergist
+b) Pectoralis major is the agonist; pectoralis minor is the synergist ✓
+c) Trapezius is the agonist; pectoralis major is the synergist
+d) Serratus anterior is the agonist; pectoralis minor is the synergist
+
+Q38. Which of the following muscles is the antagonist during cow pose (spinal extension)?
+a) Multifidus
+b) Erector spinae
+c) Quadratus lumborum
+d) Rectus abdominis ✓
+
+Q39. Which of the following is the correct definition of a fixator muscle?
+a) A muscle that produces the same movement as the agonist
+b) A muscle that relaxes to allow the prime mover to work
+c) A muscle that contracts to hold body parts stable and prevent unwanted movement ✓
+d) A muscle that initiates and controls the primary movement
+
+Q40. In the forearm, which is the prime mover for elbow flexion, and which are the synergists?
+a) Brachialis is the prime mover; biceps brachii and brachioradialis are synergists
+b) Biceps brachii is the prime mover; brachialis and brachioradialis are synergists ✓
+c) Brachioradialis is the prime mover; biceps brachii and brachialis are synergists
+d) All three work equally as prime movers with no synergist relationship
+
+Q41. Which of the following correctly describes the role of the interspinous ligament?
+a) Runs along the front of vertebral bodies preventing hyperextension
+b) Encloses the gap between vertebrae protecting the spinal cord
+c) Connects adjacent spinous processes and prevents too much forward flexion ✓
+d) Runs along the back of vertebral bodies preventing hyperflexion
+
+Q42. Which of the following correctly describes the role of the ligamentum flavum?
+a) Runs along the front of vertebral bodies preventing hyperextension
+b) Connects spinous processes and prevents too much forward flexion
+c) Runs along the back of vertebral bodies preventing hyperflexion
+d) Encloses the gap between vertebrae and protects the spinal cord from exposure ✓
+
+Q43. Which of the following is a function of the thoracolumbar fascia (TLF)?
+a) Rotation of the spine
+b) Lateral flexion of the spine
+c) Back extension of the spine
+d) Stabilisation of the spine ✓
+
+Q44. What is one of the functions of the thoracolumbar fascia (TLF)?
+a) Rotation of the spine
+b) Back extension of the spine
+c) Stabilisation of the spine ✓
+d) Lateral flexion of the spine
+
+Q45. Which of the following correctly describes the role of the posterior longitudinal ligament?
+a) Prevents hyperextension of the spine
+b) Prevents too much forward flexion
+c) Encloses the gap between vertebrae
+d) Prevents hyperflexion of the spine ✓
+
+Q46. Which of the following is a ligament that supports the spine?
+a) Medial collateral ligament
+b) Anterior talofibular ligament
+c) Iliofemoral ligament
+d) Posterior longitudinal ligament ✓
+
+Q47. Which of the following correctly describes the role of the supraspinous ligament?
+a) Prevents hyperextension of the spine
+b) Encloses the gap between vertebrae protecting the spinal cord
+c) Prevents too much forward flexion ✓
+d) Prevents hyperflexion of the spine
+
+Q48. Which of the following correctly identifies what the interspinous ligament prevents?
+a) Hyperextension of the spine
+b) Hyperflexion of the spine
+c) Too much forward flexion ✓
+d) Lateral flexion of the spine
+
+Q49. What is the function of the ligamentum flavum?
+a) Prevents hyperextension of the spine
+b) Prevents too much forward flexion
+c) Encloses the gap between vertebrae and protects the spinal cord ✓
+d) Connects the spinous processes and prevents excessive flexion
+
+Q50. Which of the following correctly describes the role of the anterior longitudinal ligament in yoga practice?
+a) It prevents the spine from going into excessive forward flexion during forward folds
+b) It becomes stressed during deep backbends due to its role in preventing hyperextension ✓
+c) It encloses the spinal cord and becomes compressed during twisting postures
+d) It prevents hyperflexion and becomes stressed during backbends
+
+Q51. Which of the following correctly describes the role of the anterior longitudinal ligament?
+a) Prevents hyperflexion of the spine
+b) Encloses the gap between vertebrae protecting the spinal cord
+c) Prevents hyperextension of the spine ✓
+d) Prevents too much forward flexion
+
+Q52. Which of the following correctly describes the role of chemoreceptors as sensory receptors?
+a) Detect changes in blood pressure
+b) Detect changes in body position
+c) Detect changes in temperature
+d) Detect changes in carbon dioxide levels ✓
+
+Q53. What is the role of the neuromuscular junction?
+a) Where nerve impulses travel from one neuron to another
+b) Where the motor neuron and individual muscle fibre meet ✓
+c) Where the brain interprets incoming sensory signals
+d) Where acetylcholine is broken down after muscle contraction
+
+Q54. Which of the following correctly describes the all-or-none response?
+a) Either the whole muscle contracts fully or not at all
+b) All motor units in the body fire simultaneously during maximal effort
+c) When a motor neuron fires, every muscle fibre it innervates contracts maximally ✓
+d) A muscle fibre contracts partially depending on the strength of the stimulus
+
+Q55. What type of 'strands' are Golgi tendon organs made from?
+a) Potassium strands
+b) Calcium strands
+c) Collagen strands ✓
+d) Sodium strands
+
+Q56. Which of the following correctly describes what the all-or-none response means in practice?
+a) Either the whole muscle contracts or it doesn't contract at all
+b) When a motor neuron is activated, every muscle fibre it connects to contracts maximally ✓
+c) A muscle fibre either contracts partially or fully depending on stimulus strength
+d) All motor units in a muscle fire simultaneously during maximal effort
+
+Q57. Which sensory receptor detects changes in body temperature in the internal environment?
+a) Baroreceptor
+b) Thermoreceptor ✓
+c) Proprioceptor
+d) Chemoreceptor
+
+Q58. Which of the following is an example of a proprioceptor?
+a) Chemoreceptor
+b) Thermoreceptor
+c) Baroreceptor
+d) Muscle spindle ✓
+
+Q59. Which of the following correctly describes the role of the Golgi tendon organ's reverse stretch reflex?
+a) When a muscle is stretched, an afferent signal causes the muscle to contract
+b) When tension in the tendon is detected, an efferent signal causes the muscle to relax ✓
+c) When a joint reaches its end range, the muscle spindle triggers contraction
+d) When a motor neuron fires, all connected muscle fibres contract maximally
+
+Q60. In downward-facing dog, cueing a student to "lift their toes towards their shins" to encourage the heels to lower is an example of which principle?
+a) Autogenic inhibition
+b) The all-or-none response
+c) Reciprocal inhibition ✓
+d) The reverse stretch reflex
+
+Q61. Which muscle fibre type has the lowest firing threshold and would be recruited during a low intensity pose such as warrior 2?
+a) Type 2b
+b) Type 2a
+c) Type 1 ✓
+d) All fibre types fire simultaneously
+
+Q62. Which type of internal sensory receptor detects changes in carbon dioxide levels?
+a) Baroreceptors
+b) Thermoreceptors
+c) Chemoreceptors ✓
+d) Proprioceptors
+
+Q63. Which of the following correctly describes how yoga affects the nervous system with regular practice?
+a) Nerve impulses become weaker and motor unit recruitment decreases
+b) The sympathetic nervous system becomes permanently dominant
+c) Nerve impulses become stronger and more synchronised, improving coordination and balance ✓
+d) The somatic nervous system takes over control of unconscious functions
+
+Q64. What is the name given to a single motor neuron plus all the muscle cells it innervates?
+a) Neuromuscular junction
+b) Motor unit ✓
+c) Synapse junction
+d) Action potential
+
+Q65. Which of the following correctly describes the role of baroreceptors?
+a) Detect changes in carbon dioxide levels in the blood
+b) Detect changes in body position and movement
+c) Detect changes in temperature in the internal environment
+d) Detect changes in blood pressure ✓
+
+Q66. Which of the following correctly describes the impact of age on osteoblasts and osteoclasts?
+a) Osteoblasts increase and osteoclasts decrease, leading to stronger bones
+b) Both osteoblasts and osteoclasts increase equally, maintaining bone density
+c) Osteoclasts increase and osteoblasts decrease, leading towards osteoporosis ✓
+d) Both osteoblasts and osteoclasts decrease, slowing bone turnover
+
+Q67. Which of the following correctly describes how regular yoga impacts bone mineral density?
+a) Yoga reduces osteoblast activity, decreasing bone mineral density over time
+b) Yoga is a weight-bearing exercise that stimulates osteoblasts, increasing calcium deposition and strengthening bones ✓
+c) Yoga has no impact on bone mineral density as it is not a high impact sport
+d) Yoga increases osteoclast activity, leading to stronger but lighter bones
+
+Q68. What connects the ribs to the sternum, and what is this structure susceptible to?
+a) Tendons; susceptible to DOMS from repetitive breathing
+b) Compact bone; susceptible to osteoporosis with age
+c) Cartilage; susceptible to impact injury ✓
+d) Ligaments; susceptible to hyperflexion during forward folds
+
+Q69. Which of the following correctly describes osteoporosis?
+a) Inflammation of the joints common in older people
+b) Bones become more porous and weaker due to decreased bone mineral density ✓
+c) An anterior shift of one vertebra on another
+d) The natural wearing of cartilage on the ends of bones
+
+Q70. Which type of bone tissue is most affected by osteoporosis?
+a) Compact bone
+b) Cancellous bone ✓
+c) Periosteum
+d) Hyaline cartilage
+
+Q71. Which of the following is a long-term hormonal benefit of regular yoga practice?
+a) Increased sympathetic activity and cortisol release at rest
+b) Reduced sympathetic activity at rest, with reduced cortisol and adrenal release ✓
+c) Decreased insulin sensitivity at the muscles
+d) Reduced glucagon production from the pancreas
+
+Q72. Where is the pineal gland located?
+a) Base of the brain, linked to the central nervous system
+b) Four small glands behind the thyroid in the neck
+c) Deep in the middle of the brain ✓
+d) On top of each kidney
+
+Q73. Which of the following correctly describes the role of adrenaline produced by the adrenal glands?
+a) Regulates metabolism of all cells and tissues in the body
+b) Controls calcium levels within the blood
+c) Promotes sympathetic activity and boosts heart rate during exercise ✓
+d) Moves glucose into the muscles to lower blood sugar
+
+Q74. Which of the following correctly identifies the location of the thyroid gland?
+a) Deep in the middle of the brain
+b) Abdominal cavity
+c) On top of each kidney
+d) Neck ✓
+
+Q75. Which gland releases melatonin to assist sleep?
+a) Parathyroid
+b) Pituitary
+c) Pancreas
+d) Pineal ✓
+
+Q76. Which of the following describes the effect of too much exercise on the endocrine system?
+a) Increased testosterone and human growth hormone production
+b) Improved insulin sensitivity and greater glucagon production
+c) Excessive production of adrenaline and cortisol leading to adrenal fatigue ✓
+d) Increased release of dopamine, serotonin and endorphins
+
+Q77. Which hormone controls calcium levels within the blood?
+a) Human growth hormone
+b) Progesterone
+c) Testosterone
+d) Parathyroid hormone ✓
+
+Q78. What system produces hormones that regulate metabolism, growth and development?
+a) Endocrine ✓
+b) Respiratory
+c) Lymphatic
+d) Nervous
+
+Q79. Which of the following best describes how hormones differ from nerve signals?
+a) Hormones are faster than nerve signals and act locally
+b) Hormones are slower than nerve signals and produce responses away from the site of production ✓
+c) Hormones and nerve signals work at exactly the same speed
+d) Hormones are faster than nerve signals and act at the site of production
+
+Q80. Which of the following correctly describes the role of the pancreas in the endocrine system?
+a) Produces adrenaline and cortisol to regulate the stress response
+b) Produces thyroxine to regulate metabolism of all cells
+c) Produces insulin and glucagon to regulate blood glucose levels ✓
+d) Produces human growth hormone to regulate body composition
+
+Q81. Which of the following correctly describes the role of insulin produced by the pancreas?
+a) Moves glucose out of the muscles and raises blood sugar
+b) Regulates metabolism of all cells and tissues
+c) Moves glucose into the muscles and lowers blood sugar ✓
+d) Controls calcium levels within the blood
+
+Q82. Within the endocrine system, which gland is the 'master gland'?
+a) Adrenal
+b) Pancreas
+c) Thyroid
+d) Pituitary ✓
+
+Q83. Which of the following correctly identifies the location of the pancreas?
+a) On top of each kidney
+b) Base of the brain
+c) Neck
+d) Abdominal cavity ✓
+
+Q84. What is the role of the hypothalamus in the endocrine system?
+a) Produces human growth hormone to regulate body composition
+b) Controls the activity of other glands and instructs them to release hormones ✓
+c) Produces melatonin to maintain normal sleep patterns
+d) Regulates metabolism through the production of thyroxine
+
+Q85. Which of the following correctly describes the role of glucagon?
+a) Moves glucose into the muscles and lowers blood sugar
+b) Regulates the metabolic rate of all cells and tissues
+c) Moves glucose out of the muscles and raises blood sugar ✓
+d) Controls sympathetic activity and the stress response
+
+Q86. Which of the following correctly identifies the role of the pituitary gland?
+a) Produces melatonin to regulate sleep patterns
+b) Produces human growth hormone to regulate body composition, fluids and bone and muscle growth ✓
+c) Produces thyroxine to regulate metabolism
+d) Produces adrenaline to stimulate sympathetic activity
+
+Q87. Which of the following is a short term hormonal response to yoga practice?
+a) Reduced cortisol levels at rest
+b) Improved insulin sensitivity
+c) Increased release of dopamine, serotonin and endorphins ✓
+d) Greater glucagon production
+
+Q88. Which of the following correctly describes a short-term hormonal response to yoga?
+a) Increased release of cortisol and adrenaline
+b) Increased release of feel-good hormones such as dopamine, serotonin and endorphins ✓
+c) Increased release of insulin and glucagon
+d) Decreased release of all hormones in the endocrine system
+
+Q89. Which of the following correctly describes the role of the adrenal glands in exercise?
+a) Produce thyroxine to increase metabolic rate during exercise
+b) Produce insulin to move glucose into the working muscles
+c) Release adrenaline to boost heart rate and increase blood supply during exercise ✓
+d) Produce melatonin to regulate recovery and sleep after exercise
+
+Q90. Which hormone is produced by the ovaries and promotes feminine features including the menstrual cycle?
+a) Testosterone and cortisol
+b) Progesterone and oestrogen ✓
+c) Insulin and glucagon
+d) Adrenaline and noradrenaline
+
+Q91. Which hormone regulates metabolism of all cells and tissues in the body?
+a) Oestrogen
+b) Cortisol
+c) Thyroxine ✓
+d) Insulin
+
+Q92. What is the name of the system comprised of hormone-producing glands?
+a) Endocrine ✓
+b) Nervous
+c) Respiratory
+d) Lymphatic
+
+Q93. Which of the following correctly identifies where the testes are located?
+a) Pelvic region internally
+b) Abdominal cavity
+c) Below the pelvis externally ✓
+d) On top of each kidney
+
+Q94. Which of the following correctly describes the location of the hypothalamus?
+a) Deep in the middle of the brain
+b) Four small glands behind the thyroid
+c) Base of the brain with a direct link to the CNS ✓
+d) On top of each kidney
+
+Q95. Which of the following hormones is produced by the pancreas and moves glucose into the muscles?
+a) Glucagon
+b) Cortisol
+c) Thyroxine
+d) Insulin ✓
+
+Q96. Where in the body are the adrenal glands located?
+a) Behind the thyroid in the neck
+b) Deep in the middle of the brain
+c) In the abdominal cavity
+d) On top of each kidney ✓
+
+Q97. Which of the following correctly describes the role of the ATP cycle?
+a) ATP is produced once and stored permanently in the muscles for use during exercise
+b) ATP is continuously used and recycled by the energy systems to provide a constant supply of energy ✓
+c) ATP is only produced during rest and stored for use during exercise
+d) ATP is produced exclusively by the aerobic system during low intensity exercise
+
+Q98. Which of the following is a metabolic by-product of the anaerobic glycolysis system?
+a) Carbon dioxide and water
+b) Phosphocreatine
+c) Lactate/lactic acid ✓
+d) No by-products are produced
+
+Q99. Which of the following statements about energy systems is correct?
+a) Only one energy system works at any given time
+b) The aerobic system is always the dominant system regardless of intensity
+c) Energy systems work together, with contribution depending on intensity and duration ✓
+d) The ATP-PC system takes over from the aerobic system during low intensity exercise
+
+Q100. What is the approximate full recovery time for the aerobic energy system?
+a) 2-3 minutes
+b) 1-2 hours
+c) 30 seconds
+d) 24 hours ✓
+
+Q101. What fuel does the anaerobic glycolysis system use?
+a) Phosphocreatine
+b) Glucose and fats
+c) ATP only
+d) Glucose ✓
+
+Q102. How long does stored ATP in the skeletal muscles last during exercise?
+a) 30 seconds
+b) 2 minutes
+c) 2 seconds ✓
+d) 10 seconds
+
+Q103. Which of the following energy systems produces no metabolic by-products?
+a) Aerobic system
+b) Anaerobic glycolysis
+c) All three produce by-products
+d) ATP-PC system ✓
+
+Q104. Which energy system would be predominantly used during a gentle yin yoga class?
+a) ATP-PC system
+b) Anaerobic glycolysis
+c) Aerobic system ✓
+d) All three systems equally
+
+Q105. Which of the following is correct regarding the ATP-PC system's recovery time?
+a) 30 seconds for half recovery, 2-3 minutes for full recovery ✓
+b) 10 minutes for half recovery, 1-2 hours for full recovery
+c) 6 hours for half recovery, 24 hours for full recovery
+d) 2 minutes for half recovery, 10 minutes for full recovery
+
+Q106. Which of the following correctly describes the aerobic energy system?
+a) Uses phosphocreatine, very high intensity, lasts 10-30 seconds, no by-products
+b) Uses glucose, moderate to high intensity, lasts 1-2 minutes, produces lactic acid
+c) Uses glucose and fats, low to moderate intensity, lasts 2+ minutes, produces CO2 and water ✓
+d) Uses glucose only, high intensity, lasts 2+ minutes, produces carbon dioxide
+
+Q107. What is the primary fuel source of the ATP-PC energy system?
+a) Glucose
+b) Fats
+c) Phosphocreatine ✓
+d) Glucose and fats
+
+Q108. Approximately how many seconds of stored ATP does the body hold within the skeletal muscles?
+a) 30 seconds
+b) 10 seconds
+c) 2 seconds ✓
+d) 60 seconds
+
+Q109. What is the full recovery time for the anaerobic glycolysis energy system?
+a) 30 seconds
+b) 2-3 minutes
+c) 6 hours
+d) 1-2 hours ✓
+
+Q110. Which of the following correctly identifies the fuel used by the aerobic energy system?
+a) Phosphocreatine only
+b) Glucose only
+c) Glucose and fats ✓
+d) Fats only
+
+Q111. Which of the following is a metabolic by-product of the aerobic energy system?
+a) Lactic acid
+b) Phosphocreatine
+c) Carbon dioxide and water ✓
+d) No by-products are produced
+
+Q112. Which of the following correctly describes how energy system contribution changes during a yoga class as intensity increases?
+a) The aerobic system becomes more dominant as intensity increases
+b) The ATP-PC system shuts down completely during moderate intensity sequences
+c) The anaerobic systems contribute more as intensity increases ✓
+d) Energy system contribution remains constant regardless of intensity
+
+Q113. Which of the following correctly describes what unfamiliar asanas do to the energy systems?
+a) They predominantly use the aerobic system as the body is relaxed
+b) They result in higher concentration from the anaerobic systems due to increased physical stress ✓
+c) They bypass the ATP-PC system entirely
+d) They have no effect on energy system contribution
+
+Q114. Which energy system uses phosphocreatine as its fuel and lasts approximately 10-30 seconds?
+a) Aerobic system
+b) Anaerobic glycolysis
+c) ATP-PC system ✓
+d) Lactic acid system
+
+Q115. Which vessel carries deoxygenated blood from the upper body into the right atrium?
+a) Inferior vena cava
+b) Aorta
+c) Pulmonary vein
+d) Superior vena cava ✓
+
+Q116. What is the name of the node in the heart that acts as a built-in pacemaker?
+a) Atrioventricular node
+b) Sinoatrial node ✓
+c) Purkinje fibres
+d) Bundle of His
+
+Q117. Which type of valve are the aortic and pulmonary valves classified as?
+a) Atrioventricular valves
+b) Semilunar valves ✓
+c) Bicuspid valves
+d) Tricuspid valves
+
+Q118. How many coronary arteries supply blood to the heart?
+a) Two
+b) Four
+c) Three ✓
+d) One
+
+Q119. Which valve sits between the right atrium and right ventricle?
+a) Aortic valve
+b) Bicuspid valve
+c) Pulmonary valve
+d) Tricuspid valve ✓
+
+Q120. Which vessel carries oxygenated blood away from the heart to the rest of the body?
+a) Pulmonary artery
+b) Superior vena cava
+c) Aorta ✓
+d) Pulmonary vein
+
+Q121. Which is a function of systemic circulation?
+a) To transfer nutrients around the body
+b) To carry deoxygenated blood away from the heart to the body
+c) To transfer oxygenated blood back to the heart from the body
+d) To carry oxygenated blood away from the heart to the body ✓
+
+Q122. Which is a function of pulmonary circulation?
+a) To carry oxygenated blood from the heart to the lungs
+b) To transfer deoxygenated blood to the body
+c) To carry deoxygenated blood from the heart to the lungs ✓
+d) To transfer nutrients around the body
+
+Q123. Which of the following correctly describes the role of the pulmonary veins?
+a) Carry deoxygenated blood from the heart to the lungs
+b) Carry oxygenated blood from the lungs towards the heart ✓
+c) Carry oxygenated blood from the heart to the body
+d) Carry deoxygenated blood from the lower body into the right atrium
+
+Q124. What happens to the diastole phase of the cardiac cycle as heart rate increases during exercise?
+a) It lengthens to allow more blood to fill the heart
+b) It disappears entirely at maximum heart rate
+c) It gets shorter to allow the cycle to repeat faster ✓
+d) It stays the same length regardless of heart rate
+
+Q125. In what order does blood flow through the chambers of the heart?
+a) Left atrium → left ventricle → right atrium → right ventricle
+b) Right atrium → right ventricle → lungs → left atrium → left ventricle → body ✓
+c) Right ventricle → left atrium → right atrium → left ventricle → lungs → body
+d) Left ventricle → right atrium → lungs → right ventricle → left atrium → body
+
+Q126. What is the contraction phase of the cardiac cycle called?
+a) Diastole
+b) Pulmonary
+c) Systemic
+d) Systole ✓
+
+Q127. Which of the following is an exception to the rule that arteries carry oxygenated blood?
+a) The aorta
+b) The superior vena cava
+c) The pulmonary artery ✓
+d) The inferior vena cava
+
+Q128. What is the role of the coronary arteries?
+a) Carry deoxygenated blood from the heart to the lungs
+b) Carry oxygenated blood from the lungs to the heart
+c) Supply blood and oxygen to the cardiac muscle of the heart itself ✓
+d) Connect the left and right ventricles
+
+Q129. Which of the following correctly describes the role of coronary arteries?
+a) They carry deoxygenated blood away from the heart to the lungs
+b) They supply blood and oxygen to the cardiac muscle itself ✓
+c) They carry oxygenated blood back to the heart from the body
+d) They connect the left and right ventricles
+
+Q130. Which of the following correctly describes capillarisation as a long-term adaptation to training?
+a) An increase in the size of arteries leading to the heart
+b) An increase in capillaries between the arterioles and venules to deliver more oxygen and nutrients to working muscles ✓
+c) An increase in the number of veins returning blood to the heart
+d) An increase in the thickness of the capillary walls to handle higher pressure
+
+Q131. What is the formula for calculating cardiac output?
+a) Heart rate ÷ stroke volume
+b) Stroke volume ÷ heart rate
+c) Stroke volume × heart rate ✓
+d) Heart rate + stroke volume
+
+Q132. What is the average stroke volume of an untrained heart?
+a) 5ml
+b) 100ml
+c) 75ml ✓
+d) 200ml
+
+Q133. Which of the following correctly describes the long-term effect of regular training on heart rate?
+a) Resting heart rate increases because the heart must work harder
+b) Resting heart rate decreases because increased stroke volume means fewer beats are needed ✓
+c) Resting heart rate increases to maintain the same cardiac output
+d) Resting heart rate stays the same because cardiac output remains unchanged
+
+Q134. Which of the following correctly describes the blood pressure effect of a yoga practitioner moving from a seated to a standing pose?
+a) Blood pressure decreases as the body relaxes
+b) Blood pressure increases compared to seated ✓
+c) Blood pressure remains the same as in seated poses
+d) Blood pressure decreases to the same level as lying down
+
+Q135. Which of the following is a long term effect of regular yoga on the cardiovascular system?
+a) Immediate increase in heart rate and stroke volume
+b) Temporary vasodilation in working muscles
+c) Cardiac hypertrophy and increased stroke volume ✓
+d) Short term increase in cardiac output during exercise
+
+Q136. What is meant by cardiac output?
+a) The amount of blood pumped from the heart in one beat
+b) The amount of blood pumped from the heart in 1 hour
+c) The amount of blood pumped from the heart in 1 minute ✓
+d) The amount of blood pumped from the heart in a given time period
+
+Q137. Which blood pressure category is defined by a systolic reading above 140 mmHg?
+a) Normal
+b) Hypotension
+c) Pre high blood pressure
+d) Hypertension ✓
+
+Q138. Which of the following correctly describes left ventricular hypertrophy as a long-term effect of regular training?
+a) An increase in the thickness of the cardiac muscle of the left ventricle, allowing more force per beat ✓
+b) A decrease in the size of the left ventricle to make the heart more efficient
+c) An increase in the resting heart rate as the heart works harder
+d) A decrease in stroke volume as the heart adapts to lower demand
+
+Q139. Which of the following correctly describes what happens to blood during capillarisation as a result of regular exercise?
+a) Existing capillaries widen permanently through vasodilation
+b) New capillaries develop in the muscles being worked, increasing blood delivery ✓
+c) Blood is redirected away from muscles towards the internal organs
+d) The number of capillaries decreases as the heart becomes more efficient
+
+Q140. Which of the following correctly describes arterioles?
+a) The smallest version of a vein, returning blood towards the heart
+b) One-cell-thick vessels that are the site of gaseous exchange
+c) Smaller versions of arteries that regulate blood flow through vasodilation and vasoconstriction ✓
+d) Vessels that carry oxygenated blood directly to the venules
+
+Q141. What is thickening and hardening of the artery walls known as?
+a) Atherosclerosis
+b) Osteoporosis
+c) Arteriosclerosis ✓
+d) Osteoarthritis
+
+Q142. What is the long-term effect of training on blood plasma?
+a) Plasma levels decrease as the heart becomes more efficient
+b) Plasma increases significantly, allowing blood to flow more fluidly ✓
+c) Plasma increases uniformly with red blood cells
+d) Plasma levels remain unchanged with training
+
+Q143. What is subcutaneous fat?
+a) Fat stored on vital organs such as the heart
+b) Fat stored within the coronary arteries
+c) Visible fat stored under the skin ✓
+d) Fat stored in the medullary cavity of long bones
+
+Q144. What disease of the arteries is characterised by fatty material being deposited on their inner walls?
+a) Osteoporosis
+b) Arteriosclerosis
+c) Atherosclerosis ✓
+d) Osteoarthritis
+
+Q145. Which of the following correctly describes HDL cholesterol?
+a) The 'bad' cholesterol that contributes to plaque build-up in arteries
+b) The 'good' cholesterol that helps remove other forms of cholesterol from the bloodstream ✓
+c) A type of fat stored under the skin
+d) A type of fat stored on the vital organs
+
+Q146. Which of the following is a function of platelets in the blood?
+a) Transport oxygen and carbon dioxide around the body
+b) Protect the body from infection by producing antibodies
+c) Help blood to flow by transporting substances through the blood
+d) Stop bleeding by clotting and creating scabs ✓
+
+Q147. Which of the following correctly orders blood vessels from largest to smallest?
+a) Veins → venules → capillaries → arterioles → arteries
+b) Arteries → arterioles → capillaries → venules → veins ✓
+c) Capillaries → arterioles → arteries → veins → venules
+d) Arterioles → arteries → veins → venules → capillaries
+
+Q148. What is the long-term effect of regular exercise on blood volume?
+a) A large increase in red blood cells and a small increase in plasma
+b) A large increase in plasma and a small increase in red blood cells ✓
+c) An equal increase in all blood components
+d) A decrease in blood volume as the heart becomes more efficient
+
+Q149. Which of the following is a role of red blood cells?
+a) Clot to stop bleeding when skin is damaged
+b) Produce antibodies to fight infection
+c) Help blood to flow and transport substances
+d) Transport oxygen and carbon dioxide around the body ✓
+
+Q150. Where in a blood vessel wall is smooth muscle (tunica media) found, and what is its role?
+a) On the outer wall; protects the vessel from impact
+b) Within the walls of arteries and veins; allows the vessels to vasodilate and vasoconstrict ✓
+c) Inside the lumen; directly carries the red blood cells
+d) Only in capillaries; supports gaseous exchange
+
+Q151. What happens to HDL cholesterol levels as a result of regular exercise?
+a) HDL decreases and LDL increases
+b) Both HDL and LDL decrease
+c) HDL increases and LDL decreases ✓
+d) Both HDL and LDL increase
+
+Q152. Which of the following correctly describes the composition of blood plasma?
+a) Contains haemoglobin that binds to oxygen for transport
+b) A watery substance that helps blood flow and transports substances through the blood ✓
+c) Produces antibodies to fight infection and destroy foreign bodies
+d) Clots at sites of damage to prevent blood loss
+
+Q153. What is the role of capillaries in the cardiovascular system?
+a) Carry oxygenated blood away from the heart at high pressure
+b) Return deoxygenated blood back towards the heart
+c) Site of gaseous exchange, one cell thick, found in muscles and organs ✓
+d) Regulate blood flow through vasodilation and vasoconstriction
+
+Q154. What is the role of the pharynx?
+a) Produces sound when air passes through it
+b) Acts as a lid that closes over the windpipe during swallowing
+c) Allows constriction of passageways and prevents food entering the airways when swallowing ✓
+d) Made of cartilage rings that form the central windpipe
+
+Q155. Which of the following adaptations occurs in the respiratory system as a result of regular training?
+a) Increased breathing rate at rest and decreased tidal volume
+b) Decreased strength of respiratory muscles and increased residual volume
+c) Increased tidal volume, vital capacity and gaseous exchange ✓
+d) Decreased gaseous exchange and increased breathing rate
+
+Q156. Which of the following correctly describes the role of the diaphragm during inspiration?
+a) It relaxes and moves upwards pushing the lungs up and assisting exhalation
+b) It contracts and moves downwards giving space for the lungs to expand ✓
+c) It contracts and moves upwards expanding the thoracic cavity
+d) It relaxes and moves downwards drawing air into the lungs
+
+Q157. What is the role of the epiglottis in the respiratory system?
+a) Produces sound when air passes over it
+b) A flap of cartilage on top of the larynx that prevents food entering the trachea ✓
+c) Filters dust and particles from inhaled air
+d) Splits the trachea into two bronchi
+
+Q158. Which of the following correctly describes what happens to breathing rate and tidal volume during exercise?
+a) Breathing rate decreases and tidal volume stays the same
+b) Breathing rate increases and tidal volume decreases
+c) Both breathing rate and tidal volume increase ✓
+d) Breathing rate stays the same and tidal volume increases only
+
+Q159. Where does gaseous exchange take place in the respiratory system?
+a) In the bronchioles
+b) In the trachea
+c) In the alveoli ✓
+d) In the bronchi
+
+Q160. Which of the following is a long-term respiratory adaptation to regular training?
+a) Reduced lung capacity
+b) Increased strength of respiratory muscles and improved efficiency of gaseous exchange ✓
+c) Reduced number of alveoli
+d) Increased residual volume above 5L
+
+Q161. Which of the following structures in the respiratory system is made up of rings of cartilage stacked to form the central windpipe?
+a) Bronchi
+b) Larynx
+c) Pharynx
+d) Trachea ✓
+
+Q162. Which of the following describes the action of internal intercostal muscles?
+a) Pull the ribcage outwards to expand it and assist inhalation
+b) Pull the ribcage inwards to compress it and assist exhalation ✓
+c) Contract downwards to create space for the lungs to expand
+d) Relax upwards to push the lungs and assist exhalation
+
+Q163. At what point does the trachea split into two separate airways?
+a) At the alveoli
+b) At the bronchi ✓
+c) At the bronchioles
+d) At the larynx
+
+Q164. Which of the following correctly describes what happens during expiration?
+a) Diaphragm contracts downwards, external intercostals expand the rib cage, oxygen enters
+b) Diaphragm relaxes upwards, internal intercostals compress the rib cage, CO2 exits ✓
+c) Diaphragm contracts upwards, external intercostals compress the rib cage, CO2 exits
+d) Diaphragm relaxes downwards, internal intercostals expand the rib cage, oxygen enters
+
+Q165. How many lobes does the right lung have, and why does the left lung have fewer?
+a) Right: 3 lobes; left: 2 lobes, because space is needed for the heart ✓
+b) Right: 2 lobes; left: 3 lobes, because the heart sits on the right side
+c) Right: 3 lobes; left: 3 lobes; both are equal in size
+d) Right: 4 lobes; left: 2 lobes, to accommodate the larger right ventricle
+
+Q166. What is the average breathing rate at rest?
+a) 6-10 breaths per minute
+b) 12-15 breaths per minute ✓
+c) 20-25 breaths per minute
+d) 40-60 breaths per minute
+
+Q167. Which accessory muscles assist inhalation during exercise by expanding and lifting the rib cage?
+a) Transverse abdominis, rectus abdominis
+b) Internal intercostals, diaphragm
+c) Pectoralis minor, sternocleidomastoid and scalene ✓
+d) External obliques, quadratus lumborum
+
+Q168. What is the role of the larynx?
+a) A passageway behind the nose, mouth and throat
+b) A flap of cartilage that protects the airway during swallowing
+c) A piece of cartilage on top of the windpipe that contains the vocal cords ✓
+d) The point where the trachea splits into two airways
+
+Q169. Why does extending the length of exhalations help the body move deeper into a yoga asana?
+a) Exhalation activates the sympathetic nervous system, reducing muscle tone
+b) Exhalation contracts the diaphragm and increases intra-abdominal pressure
+c) Exhalation passively relaxes the muscular system, allowing greater range of motion ✓
+d) Exhalation increases blood pressure, which forces the joints into a deeper range
+
+Q170. Which of the following correctly describes the mechanism of gaseous exchange?
+a) Gases move from an area of low concentration to high concentration
+b) Gases are actively pumped by the cardiac muscle
+c) Gases move from an area of high concentration to low concentration ✓
+d) Oxygen moves from blood to the alveoli and carbon dioxide moves from alveoli into blood
+
+Q171. What is the approximate residual volume of the lungs?
+a) 0.5L
+b) 3-4L
+c) 5L
+d) 1.5L ✓
+
+Q172. Which of the following is NOT listed as a benefit of nasal breathing over oral breathing?
+a) Filters the air
+b) Moistens the air
+c) Warms the air
+d) Increases the volume of air inhaled ✓
+
+Q173. What is the average vital capacity of the lungs?
+a) 0.5L
+b) 1.5L
+c) 3-4L
+d) 5L ✓
+
+Q174. Which of the following correctly describes the action of the external intercostal muscles?
+a) Pull the ribcage inwards to compress it and assist exhalation
+b) Contract downwards to create space for the lungs to expand
+c) Pull the ribcage outwards to expand it and assist inhalation ✓
+d) Relax upwards to push the lungs and assist exhalation
+
+Q175. Which muscles assist exhalation during exercise by compressing the rib cage?
+a) Pectoralis minor and sternocleidomastoid
+b) External intercostals and diaphragm
+c) Transverse abdominis and rectus abdominis ✓
+d) Scalene and internal obliques
+
+Q176. Which of the following is a long term benefit of regular yoga on the respiratory system?
+a) Temporary increase in tidal volume during a single session
+b) Increased breathing rate at rest
+c) Decreased gaseous exchange efficiency
+d) Increased strength of respiratory muscles and reduced breathing rate at rest ✓
+
+Q177. What is the role of the epiglottis?
+a) Produces sound when air passes through it
+b) Made of cartilage rings stacked to form the central windpipe
+c) Muscular tissue that constricts passageways when swallowing
+d) A flap of cartilage that closes over the windpipe during swallowing ✓
+
+Q178. What mechanism carries the action potential through the neuron?
+a) The dopamine pathway
+b) The hormonal cascade
+c) The sodium-potassium pump ✓
+d) The myelin sheath
+
+Q179. Which of the following correctly describes what happens to the sympathetic nervous system during savasana?
+a) It becomes more dominant as the body prepares for the next effort
+b) It remains equally active as during the main practice
+c) It reduces in dominance as parasympathetic activity increases ✓
+d) It completely shuts down allowing full nervous system rest
+
+Q180. Which of the following correctly describes the role of the somatic nervous system?
+a) Unconsciously regulates internal functions like heart rate and digestion
+b) Consciously controls voluntary muscle contractions ✓
+c) Automatically regulates the sympathetic and parasympathetic responses
+d) Carries sensory information from receptors to the brain
+
+Q181. What is the role of the sympathetic division of the autonomic nervous system?
+a) Slows down and brakes bodily functions
+b) Controls conscious voluntary movement
+c) Speeds up and accelerates bodily functions ✓
+d) Carries sensory information to the brain
+
+Q182. What is the name of the structure where nerve impulses pass from one neuron to another?
+a) Neuromuscular junction
+b) Axon
+c) Synapse junction ✓
+d) Dendrite
+
+Q183. Which of the following is a role of the brain?
+a) Initiation of spinal reflexes
+b) Interpretation of messages ✓
+c) Autonomic control
+d) Transfer of messages
+
+Q184. What is the role of the myelin sheath?
+a) Carries nerve impulses from one neuron to another across a gap
+b) Picks up impulses from receptors and passes them to the cell body
+c) Insulates and protects the axon ✓
+d) Interprets information within the neuron
+
+Q185. Which of the following correctly describes the difference between afferent and efferent nerves?
+a) Afferent nerves carry instructions from the brain; efferent nerves deliver information to the brain
+b) Afferent nerves deliver information to the brain; efferent nerves carry instructions from the brain ✓
+c) Both are types of autonomic nerve with no distinction in direction
+d) Afferent nerves are part of the CNS; efferent nerves are part of the PNS
+
+Q186. What is the role of the autonomic nervous system?
+a) Conscious control of body functions such as heart rate and digestion
+b) Unconscious control of movements such as smiling and walking
+c) Conscious control of movements such as smiling and walking
+d) Unconscious control of body functions such as heart rate and digestion ✓
+
+Q187. Which of the following correctly describes how the sympathetic and parasympathetic nervous systems relate to a yoga class?
+a) Sympathetic dominates throughout the class, parasympathetic only activates in savasana
+b) Parasympathetic dominates at rest at the start, sympathetic during movement, parasympathetic returns in savasana ✓
+c) Both systems are equally active throughout the entire class
+d) Parasympathetic dominates throughout as yoga is a relaxing practice
+
+Q188. What are the chemical messengers called that are transmitted across the synapse junction between neurons?
+a) Hormones
+b) Neurotransmitters ✓
+c) Action potentials
+d) Efferent signals
+
+Q189. Which part of a neuron picks up nerve impulses from receptors and passes them to the cell body?
+a) Axon
+b) Synapse junction
+c) Myelin sheath
+d) Dendrites ✓
+
+Q190. What is the name of the connective tissue that surrounds a bundle of muscle fibres?
+a) Epimysium
+b) Endomysium
+c) Aponeurosis
+d) Perimysium ✓
+
+Q191. Which of the following correctly describes the two distinct functions of the pelvic floor muscle fibre types?
+a) Type 1 fibres for reflexive resistance to abdominal pressure; Type 2 for continence control
+b) Type 1 fibres for continence control of urine and faeces; Type 2 fibres for reflexive resistance to increased abdominal pressure ✓
+c) Type 1 fibres for strength and power; Type 2 fibres for endurance and postural support
+d) Type 1 fibres for supporting the organs; Type 2 fibres for connecting muscle to bone
+
+Q192. Which of the following is a characteristic of Type 2b muscle fibres compared to Type 1?
+a) Smaller in size, red in colour, very high mitochondria
+b) Medium in size, pink in colour, aerobic and anaerobic
+c) Very large in size, white in colour, very poor blood supply ✓
+d) Small in size, red in colour, very resistant to fatigue
+
+Q193. The 'threshold response of each particular nerve cell and muscle fibre to a stimulus' is known as
+a) the 'sliding filament' theory
+b) the 'proprioceptive neuromuscular facilitation'
+c) the 'all-or-none' response ✓
+d) the 'reverse stretch reflex'
+
+Q194. Which of the following is most likely to cause DOMS?
+a) Activities that include a concentric training component
+b) Activities that include a cardiovascular training component
+c) Activities that include a flexibility training component
+d) Activities that include an eccentric training component ✓
+
+Q195. Which of the following correctly describes Type 1 muscle fibre characteristics?
+a) White, very large, anaerobic, very poor blood supply, used for power
+b) Pink, medium size, aerobic and anaerobic, medium blood supply
+c) Red, small, aerobic, very high mitochondria, very resistant to fatigue ✓
+d) White, large, anaerobic, poor blood supply, used for strength
+
+Q196. Which of the following is most likely to cause delayed onset of muscular soreness (DOMS)?
+a) Activities that include a concentric training component
+b) Activities that include a flexibility training component
+c) Activities that include an eccentric training component ✓
+d) Activities that include a cardiovascular training component
+
+Q197. When is delayed onset of muscular soreness (DOMS) typically experienced?
+a) Immediately after exercise
+b) 2-8 hours after exercise
+c) 12-72 hours after exercise ✓
+d) 4-7 days after exercise
+
+Q198. Which of the following correctly describes Type 2a muscle fibres?
+a) Red, small, aerobic only, very high mitochondria, very resistant to fatigue
+b) White, very large, anaerobic only, very low mitochondria, used for power
+c) Pink, medium size, aerobic and anaerobic, medium blood supply ✓
+d) White, large, anaerobic, poor blood supply, used for strength
+
+Q199. Which of the following correctly describes how Type 2a muscle fibres adapt in an anaerobically trained athlete?
+a) They shift more towards Type 1 characteristics
+b) They remain evenly balanced between aerobic and anaerobic
+c) They shift more towards Type 2b characteristics ✓
+d) They disappear and are replaced by Type 2b fibres entirely
+
+Q200. With regular aerobic training, what adaptation occurs within Type 1 and Type 2a muscle fibres?
+a) Muscle fibres increase in size and become white in colour
+b) Mitochondria decrease in size to improve efficiency
+c) Mitochondria grow in size and number, improving aerobic energy production ✓
+d) Fibres shift towards Type 2b characteristics to produce more power
+
+Q201. How is muscle fibre type distribution measured?
+a) By measuring oxygen consumption during maximal exercise
+b) Via a muscle biopsy ✓
+c) Through electromyography (EMG)
+d) By analysing resting heart rate and VO2 max
+
+Q202. Which of the following is a characteristic of Type 1 muscle fibres?
+a) White in colour, very large, anaerobic, poor blood supply
+b) Red in colour, small, aerobic, high resistance to fatigue ✓
+c) Pink in colour, medium size, aerobic and anaerobic
+d) White in colour, very large, used for power and strength
+
+Q203. Which of the following correctly describes muscle hypertrophy?
+a) A decrease in muscle size following excessive eccentric training
+b) The repair and growth of muscle tissue following microscopic tears caused by exercise ✓
+c) The conversion of Type 2b fibres to Type 1 fibres through aerobic training
+d) The increase in cardiac muscle thickness as a result of regular cardiovascular exercise
+
+Q204. Which of the following correctly describes cardiac muscle?
+a) Voluntary, smooth in appearance, found in hollow organs
+b) Involuntary, striated in appearance, found in the walls of the heart ✓
+c) Voluntary, striated in appearance, attached to the skeleton
+d) Involuntary, smooth in appearance, found in blood vessel walls
+
+Q205. How many types of muscle tissue are there in the body?
+a) Two
+b) Four
+c) Three ✓
+d) Five
+
+Q206. Which of the following correctly describes the Epimysium?
+a) Fascia that surrounds one individual muscle fibre
+b) Fascia that surrounds a bundle of muscle fibres
+c) Fascia that surrounds the whole muscle ✓
+d) Connective tissue that connects muscle to muscle
+
+Q207. What is the mechanism by which smooth muscle moves substances through the digestive system?
+a) Isometric contraction
+b) Voluntary concentric contraction
+c) Peristalsis ✓
+d) Eccentric sliding filament action
+
+Q208. Which of the following is a characteristic shared by both cardiac and smooth muscle?
+a) Striated appearance
+b) Voluntary control
+c) Unconscious (involuntary) control ✓
+d) Attachment to the skeleton
+
+Q209. What is the term for the increase in thickness of the cardiac muscle as a result of regular exercise?
+a) Capillarisation
+b) Vasodilation
+c) Cardiac hypertrophy ✓
+d) Stroke volume
+
+Q210. Which of the following correctly describes the role of aponeurosis?
+a) Connective tissue that connects muscle to bone
+b) Connective tissue that connects muscle to muscle ✓
+c) The fascia that surrounds an individual muscle fibre
+d) The fascia that surrounds the whole muscle
+
+Q211. Which of the following correctly describes passive stretching as practised in yin yoga?
+a) Stretches with active muscle engagement and conscious core activation
+b) Stretches with minimal muscular tension, focused on strong controlled exhalations and accessing deeper tissue ✓
+c) Stretches held isometrically with the breath held to create intra-abdominal pressure
+d) Stretches performed with the use of accessory breathing muscles to increase range of motion
+
+Q212. Which bandha is linked to the conscious engagement of the pelvic floor muscles?
+a) Uddiyana Bandha
+b) Jalandhara Bandha
+c) Mula Bandha ✓
+d) Kumbhaka Bandha
+
+Q213. Which of the following correctly describes the role of the quadratus lumborum when engaged unilaterally?
+a) Flexion of the vertebrae
+b) Compression of the abdominal cavity
+c) Lateral flexion of the lumbar spine ✓
+d) Extension of the lumbar spine
+
+Q214. Which local (deep) muscle supports posture?
+a) Erector spinae
+b) Rectus abdominis
+c) External obliques
+d) Transverse abdominis ✓
+
+Q215. Which muscle in the legs is the longest in the human body?
+a) Sartorius ✓
+b) Supraspinalis
+c) Splenius capitis
+d) Serratus anterior
+
+Q216. Which of the following correctly describes the role of the multifidus?
+a) Crosses the lumbar vertebrae only, performing lateral flexion unilaterally
+b) Crosses intervertebral joints, performing extension, rotation and lateral flexion ✓
+c) Crosses the thoracic and lumbar vertebrae, performing flexion bilaterally
+d) Sits along each side of the spine, primarily extending the vertebrae
+
+Q217. Which of the following correctly describes the role of the internal obliques when engaged bilaterally?
+a) Lateral flexion of the vertebrae
+b) Rotation of the vertebrae
+c) Compression of the abdominal cavity
+d) Flexion of the vertebrae ✓
+
+Q218. Which of the following correctly describes the role of the pelvic floor muscles in relation to intra-abdominal pressure?
+a) They provide superior support at the top of the core cylinder
+b) They provide lateral support alongside the obliques
+c) They provide posterior support behind the spine
+d) They provide inferior support at the base of the core cylinder ✓
+
+Q219. Which of the following is a pelvic floor muscle?
+a) Levator scapula
+b) Piriformis
+c) Coccygeus ✓
+d) Erector spinae
+
+Q220. Which of the following describes the action of the internal obliques when engaged unilaterally?
+a) Flexion of the vertebrae
+b) Compression of the abdominal cavity
+c) Extension of the spine
+d) Rotation and lateral flexion ✓
+
+Q221. What is one of the key functions of the core muscles?
+a) Support the chest
+b) Stabilise the hips
+c) Support the upper back
+d) Stabilise the spine ✓
+
+Q222. Which of the following correctly describes the role of the Quadratus Lumborum when engaged bilaterally?
+a) Lateral flexion of the lumbar spine to one side
+b) Extension of the lumbar spine
+c) Prevents lateral flexion, stabilising the lumbar spine ✓
+d) Rotation of the lumbar spine
+
+Q223. Which of the following best describes the role of the transverse abdominis?
+a) Flexion of the vertebrae and posterior pelvic tilt
+b) Lateral flexion and rotation of the spine
+c) Extension of the spine and lateral flexion
+d) Compression of the abdominal cavity and increased intra-abdominal pressure ✓
+
+Q224. Which of the following is a global (superficial) muscle that supports posture?
+a) Lumbar multifidus
+b) Transverse abdominis
+c) Pelvic floor
+d) Erector spinae ✓
+
+Q225. Which of the following is a primary core muscle?
+a) Trapezius
+b) Tensor fascia lata
+c) Transverse abdominis ✓
+d) Tibialis anterior
+
+Q226. Which muscles are situated along each side of the spine?
+a) Teres minor
+b) Deltoid
+c) Infraspinatus
+d) Erector spinae ✓
+
+Q227. Which of the following correctly describes the role of the diaphragm in the active system of core stability?
+a) It provides posterior support to the spine
+b) It provides inferior support at the base of the pelvis
+c) It provides superior support at the top of the core ✓
+d) It provides lateral support alongside the obliques
+
+Q228. Which of the following correctly describes what intra-abdominal pressure does for the spine?
+a) It relaxes the muscular system and allows deeper stretching
+b) It increases blood flow to the spinal discs
+c) It combines the active and passive systems to create strength and integrity through the core ✓
+d) It reduces pressure on the vertebral discs by decompressing the spine
+
+Q229. Which of the following correctly identifies the three muscles of the erector spinae group from innermost to outermost?
+a) Longissimus, spinalis, iliocostalis
+b) Iliocostalis, longissimus, spinalis
+c) Spinalis, longissimus, iliocostalis ✓
+d) Multifidus, longissimus, spinalis
+
+Q230. What is one of the key functions of the pelvic floor muscles?
+a) Stability of the spine
+b) Stability of the core
+c) Support of the trunk
+d) Support of the internal organs ✓
+
+Q231. Which of the following describes the joint action of the psoas major when the origin is fixed?
+a) Extends the hip
+b) Abducts the hip
+c) Flexes the hip ✓
+d) Laterally rotates the hip
+
+Q232. Which of the following correctly describes the role of the gracilis muscle?
+a) Crosses the hip only, performing abduction and lateral rotation
+b) Crosses the hip and knee, performing adduction of the hip and knee flexion ✓
+c) Crosses the knee only, performing extension of the knee
+d) Crosses the hip only, performing flexion and medial rotation
+
+Q233. Which of the following correctly describes the Adductor group?
+a) Longus, magnus and brevis — crosses the hip and knee, performs adduction and knee flexion
+b) Longus, magnus and brevis — crosses the hip only, performs adduction of the hip ✓
+c) Longus, magnus and brevis — crosses the hip only, performs abduction and lateral rotation
+d) Longus, magnus and brevis — crosses the hip and knee, performs adduction and hip extension
+
+Q234. Which of the following correctly describes the difference between the gastrocnemius and soleus?
+a) Gastrocnemius crosses ankle only; soleus crosses ankle and knee
+b) Gastrocnemius crosses ankle and knee; soleus crosses ankle only ✓
+c) Both cross the ankle and knee but perform different actions
+d) Both cross the ankle only but gastrocnemius also performs dorsiflexion
+
+Q235. Which of the following correctly describes the hamstrings group?
+a) Crosses the knee only, extends the knee, made up of rectus femoris, vastus medialis, vastus lateralis and vastus intermedius
+b) Crosses the hip and knee, performs knee flexion and hip extension, made up of biceps femoris, semimembranous and semitendinosus ✓
+c) Crosses the hip only, performs hip extension and lateral rotation, made up of gluteus maximus and piriformis
+d) Crosses the knee and ankle, performs knee flexion and plantar flexion, made up of gastrocnemius and soleus
+
+Q236. Which of the following correctly describes ALL joint actions of the piriformis?
+a) Adduction and medial rotation of the hip
+b) Flexion and medial rotation of the hip
+c) Adduction and lateral rotation of the hip
+d) Abduction and lateral rotation of the hip ✓
+
+Q237. Which muscle crosses both the hip and knee joint?
+a) Soleus
+b) Serratus anterior
+c) Sartorius ✓
+d) Subscapularis
+
+Q238. Which of the following correctly describes the action of the gastrocnemius?
+a) Crosses the ankle only, performs dorsiflexion and inversion
+b) Crosses the ankle only, performs plantar flexion
+c) Crosses the ankle and knee, performs plantar flexion and assists knee flexion ✓
+d) Crosses the knee only, performs knee flexion and extension
+
+Q239. What is the joint action of the gluteus minimus?
+a) Extension and lateral rotation of the hip
+b) Adduction of the hip and knee flexion
+c) Abduction and medial rotation of the hip ✓
+d) Abduction and lateral rotation of the hip
+
+Q240. Which of the following correctly describes ALL joint actions of the pectineus?
+a) Adduction of the hip only
+b) Adduction, flexion and medial rotation of the hip ✓
+c) Adduction and lateral rotation of the hip
+d) Flexion and lateral rotation of the hip only
+
+Q241. Which of the following correctly describes ALL joint actions of the sartorius?
+a) Flexion of the hip and knee only
+b) Flexion of the hip, lateral rotation of the hip and flexion of the knee ✓
+c) Flexion of the hip, medial rotation and knee extension
+d) Adduction of the hip and flexion of the knee
+
+Q242. Which of the following correctly describes the role of the vastus medialis?
+a) Crosses the hip and knee, performs hip flexion and knee extension
+b) Crosses the knee only, performs extension of the knee ✓
+c) Crosses the knee and hip, performs knee flexion and hip extension
+d) Crosses the hip only, performs adduction of the hip
+
+Q243. Which of the following correctly describes the role of the soleus?
+a) Crosses the ankle and knee, performs plantar flexion and assists knee flexion
+b) Crosses the ankle only, performs dorsiflexion and inversion
+c) Crosses the ankle only, performs plantar flexion ✓
+d) Crosses the knee only, performs knee flexion
+
+Q244. Which of the following muscles crosses both the hip and knee joint via the iliotibial (IT) band?
+a) Sartorius
+b) Gracilis
+c) Tensor fascia latae ✓
+d) Rectus femoris
+
+Q245. Which muscle crosses the knee joint?
+a) Piriformis
+b) Tibialis anterior
+c) Soleus
+d) Rectus femoris ✓
+
+Q246. Which of the following correctly describes the Tensor Fascia Latae's joint action?
+a) Extends the hip and laterally rotates
+b) Adducts the hip and flexes the knee
+c) Flexes, abducts and medially rotates the hip ✓
+d) Extends the knee and flexes the hip
+
+Q247. Which of the following correctly describes the location and action of the iliacus?
+a) Crosses the hip and lumbar vertebrae, flexes the hip and stabilises the lumbar spine
+b) Crosses the hip only, performs flexion of the hip, shares tendon with psoas major ✓
+c) Crosses the knee and hip, performs flexion of the knee and lateral rotation of the hip
+d) Crosses the hip only, performs extension and lateral rotation of the hip
+
+Q248. When the insertion of the psoas major is fixed, what joint action does it perform?
+a) Extends the trunk and anteriorly tilts the pelvis
+b) Flexes the trunk ✓
+c) Laterally flexes the lumbar spine
+d) Rotates the lumbar spine
+
+Q249. Which of the following muscles performs adduction of the hip?
+a) Gluteus medius
+b) Piriformis
+c) Pectineus ✓
+d) Tensor fascia latae
+
+Q250. Which of the following correctly describes the role of the infraspinatus?
+a) Medial rotation of the arm and stabilises the shoulder joint
+b) Assists deltoid in abduction and stabilises the shoulder joint
+c) Lateral rotation of the arm and stabilises the shoulder joint ✓
+d) Adducts and extends the arm at the shoulder
+
+Q251. Which of the following is the primary joint action of the rhomboids?
+a) Elevates the scapula
+b) Protracts the scapula
+c) Depresses the scapula
+d) Retracts the scapula ✓
+
+Q252. Which of the following correctly describes the role of the subscapularis?
+a) Assists deltoid in abduction and stabilises the shoulder joint
+b) Lateral rotation of the arm and stabilises the shoulder joint
+c) Medial rotation of the arm and stabilises the shoulder joint ✓
+d) Adducts and extends the arm and depresses the shoulder girdle
+
+Q253. Where are the biceps brachii muscles located?
+a) Lower arm
+b) Upper leg
+c) Lower leg
+d) Upper arm ✓
+
+Q254. Which joint does the supraspinatus muscle cross?
+a) Elbow
+b) Hip
+c) Knee
+d) Shoulder ✓
+
+Q255. Which of the following correctly describes the role of the rhomboids?
+a) Elevates and laterally flexes the neck unilaterally
+b) Protracts the scapula forwards around the rib cage
+c) Retracts the scapula and downwardly rotates it ✓
+d) Depresses the shoulder girdle and medially rotates the arm
+
+Q256. Which of the following describes the action of the latissimus dorsi?
+a) Elevates and retracts the scapula
+b) Protracts the scapula and elevates the rib cage
+c) Adducts, extends and medially rotates the arm ✓
+d) Abducts the shoulder and stabilises the joint
+
+Q257. Which of the following best describes the role of the serratus anterior?
+a) Retracts the scapula and downwardly rotates it
+b) Elevates the scapula and laterally flexes the neck
+c) Protracts the scapula forwards around the rib cage ✓
+d) Depresses the shoulder girdle and adducts the arm
+
+Q258. Using the SITS acronym, which rotator cuff muscle performs abduction of the shoulder?
+a) Teres minor
+b) Infraspinatus
+c) Subscapularis
+d) Supraspinatus ✓
+
+Q259. Which of the following correctly describes the role of the supraspinatus in the rotator cuff group?
+a) Medial rotation of the arm and stabilises the shoulder joint
+b) Lateral rotation of the arm and stabilises the shoulder joint
+c) Assists the deltoid in abduction and stabilises the shoulder joint ✓
+d) Adducts and extends the arm at the shoulder joint
+
+Q260. Which of the following correctly describes the brachioradialis?
+a) Flexes the elbow and supinates the forearm
+b) Flexes the elbow only, regardless of forearm position
+c) Flexes the elbow when the forearm is in a pronated position ✓
+d) Extends the elbow and assists adduction of the shoulder
+
+Q261. Which muscle covers the posterior of the neck and shoulders?
+a) Lattisimus dorsi
+b) Deltoid
+c) Infraspinatus
+d) Trapezius ✓
+
+Q262. Which of the following correctly describes the role of the pectoralis minor?
+a) Horizontal flexion of the shoulder and adduction of the arm
+b) Depresses the shoulder girdle and adducts the arm
+c) Protracts the scapula and elevates the rib cage during breathing ✓
+d) Retracts the scapula and stabilises the shoulder joint
+
+Q263. Which of the following correctly describes the role of the subscapularis in the SITS group?
+a) Assists deltoid in abduction and stabilises the shoulder
+b) Lateral rotation of the arm and stabilises the shoulder
+c) Medial rotation of the arm and stabilises the shoulder ✓
+d) Extends and adducts the arm at the shoulder
+
+Q264. Which of the following correctly describes the role of the teres major?
+a) Lateral rotation and stabilisation of the shoulder joint
+b) Assists deltoid in abduction of the shoulder
+c) Medial rotation and adduction of the shoulder ✓
+d) Protracts the scapula and elevates the rib cage
+
+Q265. Which muscle crosses the elbow joint?
+a) Levator scapula
+b) Teres major
+c) Biceps femoris
+d) Triceps brachii ✓
+
+Q266. Which of the following correctly describes the role of the levator scapulae?
+a) Retracts and downwardly rotates the scapula
+b) Bilaterally elevates the scapula, unilaterally laterally flexes the neck ✓
+c) Protracts the scapula forwards around the rib cage
+d) Depresses the shoulder girdle and adducts the arm
+
+Q267. Which of the following correctly describes the role of the brachialis?
+a) Flexes the elbow and supinates the forearm
+b) Flexes the elbow when the forearm is pronated
+c) Flexes the elbow ✓
+d) Extends the elbow and assists shoulder extension
+
+Q268. Which of the following correctly describes the pectoralis minor's joint action?
+a) Horizontal flexion and adduction of the shoulder
+b) Protracts the scapula and elevates the rib cage during breathing ✓
+c) Retracts the scapula and downwardly rotates it
+d) Depresses the shoulder girdle and adducts the arm
+
+Q269. Which of the following correctly describes the Pectoralis Major's joint action?
+a) Protracts the scapula and elevates the rib cage
+b) Retracts the scapula and depresses the shoulder girdle
+c) Horizontal flexion of the shoulder and adduction of the arm ✓
+d) Abduction of the shoulder and lateral rotation of the arm
+
+Q270. Which of the following correctly describes the action of the deltoid's posterior fibres?
+a) Flexion of the shoulder
+b) Abduction of the shoulder
+c) Extension of the shoulder ✓
+d) Adduction of the shoulder
+
+Q271. Which of the following correctly describes the role of the joint capsule?
+a) Sits between connective tissues and bone to reduce friction
+b) Connects bone to bone and provides stability
+c) Produces and keeps synovial fluid inside the joint ✓
+d) Covers the ends of bones to prevent bone on bone contact
+
+Q272. What is the role of synovial fluid in a joint?
+a) To connect bone to muscle at the joint
+b) To lubricate the joint and is absorbed into the cartilage ✓
+c) To protect the spinal cord from compression
+d) To stimulate the production of red blood cells
+
+Q273. Which of the following correctly describes a sex difference that affects joint flexibility?
+a) Females tend to have a smaller Q-angle than males, reducing knee mobility
+b) Males have greater hormonal flexibility differences than females
+c) Females have a greater Q-angle than males, affecting hip and knee alignment ✓
+d) There are no notable sex differences in joint flexibility
+
+Q274. Which of the following is a factor that affects the flexibility of joints?
+a) Joint temperature; warmer connective tissue is more pliable ✓
+b) Stroke volume; larger volume increases flexibility
+c) Type 2b muscle fibres; greater amounts increase flexibility
+d) Tidal volume; larger volume increases flexibility
+
+Q275. Which of the following is a cause of osteoarthritis?
+a) Decreased osteoblast activity leading to porous bones
+b) Natural wearing of cartilage on the ends of bones due to age or overuse ✓
+c) Fatty deposits building up on the inner walls of blood vessels
+d) Herniation of an intervertebral disc pressing on the spinal cord
+
+Q276. Which of the following is a function of the bursa in a joint?
+a) Connects muscle to bone and transmits force
+b) Produces and contains synovial fluid within the joint
+c) A pocket of fluid that sits between connective tissues and bone to reduce friction ✓
+d) A layer on the ends of bones to prevent bone-on-bone contact
+
+Q277. Which of the following is a short term effect of yoga on the joints?
+a) Increased strength of ligaments
+b) Thicker articular cartilage
+c) Increased release of synovial fluid ✓
+d) Greater collagen production in connective tissue
+
+Q278. What is the role of a bursa in a joint?
+a) Connects bone to bone across a joint
+b) Sits between connective tissues and bone tissue to stop friction ✓
+c) Produces synovial fluid for the joint
+d) Stores yellow marrow within the joint
+
+Q279. Which of the following correctly describes the composition of the vertebral column from top to bottom?
+a) 7 cervical, 5 thoracic, 12 lumbar, 5 fused sacrum, 4 fused coccyx
+b) 7 cervical, 12 thoracic, 5 lumbar, 5 fused sacrum, 4 fused coccyx ✓
+c) 5 cervical, 12 thoracic, 7 lumbar, 5 fused sacrum, 4 fused coccyx
+d) 7 cervical, 12 thoracic, 5 lumbar, 4 fused sacrum, 5 fused coccyx
+
+Q280. Which of the following correctly describes a characteristic of lumbar vertebrae?
+a) Smallest in size, most flexible, prone to injury
+b) Fused, form the back of the pelvis
+c) Support the rib cage, 12 pairs of ribs attach here
+d) Largest in size, provide strength to support the weight of the body ✓
+
+Q281. Which of the following is the correct number of thoracic vertebrae?
+a) 5
+b) 7
+c) 4
+d) 12 ✓
+
+Q282. Which of the following correctly describes a characteristic of cervical vertebrae?
+a) Largest in size, support the weight of the body, medium range of movement
+b) Smallest in size, large range of movement, prone to injury ✓
+c) Medium in size, support the rib cage, small range of movement
+d) Fused, located at the base of the spine, susceptible to fall damage
+
+Q283. Which part of the skeleton is the coccyx most susceptible to damaging?
+a) Compression from poor posture
+b) Impact from falling ✓
+c) Dehydration leading to disc shrinkage
+d) Strain from carrying uneven loads
+
+Q284. What happens to intervertebral discs when they become dehydrated?
+a) They calcify and fuse adjacent vertebrae together
+b) They bulge posteriorly and press on the spinal cord
+c) They reduce in size and lead to a reduced range of movement ✓
+d) They harden into compact bone tissue
+
+Q285. What is the primary purpose of the vertebral column?
+a) Produces blood cells and stores calcium
+b) Provides attachment points for the shoulder and hip girdles
+c) Supports the head, encloses the spinal cord and provides attachment points for bones and muscles ✓
+d) Protects the heart and lungs from impact
+
+Q286. Which of the following bones is classified as an irregular bone?
+a) Femur
+b) Patella
+c) Vertebrae ✓
+d) Cranium
+
+Q287. Which of the following correctly describes the diaphysis of a long bone?
+a) The rounded ends of the bone
+b) The main shaft of the bone ✓
+c) The connective tissue surrounding the bone
+d) The spongy tissue inside the bone
+
+Q288. Which of the following is the correct description of cancellous bone?
+a) A layer of connective tissue surrounding the surface of the bone
+b) A dense layer of bone providing strength to the skeleton
+c) A meshwork of spongy bone tissue providing lightweight potential ✓
+d) The cavity at the centre of the bone where yellow marrow is stored
+
+Q289. Where is yellow bone marrow located?
+a) In the cancellous bone tissue
+b) On the outer surface of long bones
+c) In the medullary cavity at the centre of long bones ✓
+d) Within the periosteum
+
+Q290. Which of the following correctly describes the periosteum?
+a) The cavity at the centre of the bone where yellow marrow is stored
+b) A meshwork of spongy bone tissue providing lightweight potential
+c) A layer of connective tissue surrounding the surface of the bone ✓
+d) A dense layer of bone tissue providing strength to the skeleton
+
+Q291. How many bones make up the axial skeleton?
+a) 126
+b) 206
+c) 80 ✓
+d) 60
+
+Q292. What is the function of red bone marrow?
+a) Acts as a fat reservoir within the medullary cavity
+b) Produces blood cells (red, white and platelets) ✓
+c) Provides the dense outer layer of the bone
+d) Connects bone to muscle at the joint
+
+Q293. Which of the following bones makes up the front of the collarbone?
+a) Scapula
+b) Humerus
+c) Clavicle ✓
+d) Ulna
+
+Q294. Which of the following correctly describes a function of the skeletal system related to minerals?
+a) It breaks down calcium with osteoclasts to regulate blood pH
+b) It stores calcium and phosphorus ✓
+c) It produces calcium through red marrow cell activity
+d) It secretes phosphorus directly into the bloodstream
+
+Q295. Which of the following is a function of the axial skeleton?
+a) Provides movement via levers for the arms and legs
+b) Forms the shoulder and hip girdles
+c) Protection of vital organs including the brain, heart and lungs ✓
+d) Makes up 126 of the 206 bones of the skeleton
+
+Q296. Which of the following is a function of the skeletal system related to blood?
+a) Regulates blood pressure through vasoconstriction and vasodilation
+b) Produces red blood cells, white blood cells and platelets in red bone marrow ✓
+c) Filters waste products from the blood via the kidneys
+d) Pumps blood around the body via cardiac muscle contractions
+
+Q297. Which of the following correctly identifies where red bone marrow is found?
+a) In the medullary cavity at the centre of long bones
+b) In the cancellous (spongy) bone tissue ✓
+c) In the periosteum surrounding the bone surface
+d) In the compact bone providing structural strength
+
+Q298. Which of the following correctly describes the axial skeleton?
+a) Comprises 80 bones; offers protection to the vital organs ✓
+b) Comprises 126 bones; offers movement via levers
+c) Comprises 80 bones; offers movement via levers
+d) Comprises 206 bones; provides storage of minerals
+
+Q299. Which of the following correctly describes the epiphysis of a long bone?
+a) The main shaft of the bone
+b) The rounded ends of the bone ✓
+c) The connective tissue surrounding the surface of the bone
+d) The cavity at the centre of the bone
+
+Q300. Which of the following correctly describes the appendicular skeleton?
+a) Comprises 80 bones; protects the vital organs
+b) Comprises 126 bones of the girdles and appendages; offers movement via levers ✓
+c) Comprises 206 bones; provides shape and structure
+d) Comprises 126 bones; protects the vital organs
+
+Q301. Which of the following correctly describes compact bone?
+a) A meshwork of spongy tissue providing lightweight potential to the skeleton
+b) The cavity at the centre of the bone where yellow marrow is stored
+c) A layer of connective tissue surrounding the outer surface of the bone
+d) A dense layer of bone tissue providing strength to the skeleton ✓
+
+Q302. Which of the following is a long bone?
+a) Patella
+b) Carpals
+c) Vertebrae
+d) Femur ✓`;
+
+const TOPICS = [
+  { name: "Medical Conditions of the Spine", start: 1, end: 6 },
+  { name: "Postural Deviations", start: 7, end: 20 },
+  { name: "Anatomical Planes and Movement", start: 21, end: 27 },
+  { name: "Sliding Filament Theory & Muscle Contraction", start: 28, end: 32 },
+  { name: "Muscular Contractions", start: 33, end: 34 },
+  { name: "Agonist / Antagonist / Synergist / Fixator", start: 35, end: 40 },
+  { name: "Spinal Ligaments and Connective Tissue", start: 41, end: 51 },
+  { name: "Motor Units, Reflexes and Sensory Receptors", start: 52, end: 65 },
+  { name: "Bone Health, BMD and Osteoporosis", start: 66, end: 70 },
+  { name: "Endocrine System and Hormones", start: 71, end: 96 },
+  { name: "Energy Systems and ATP", start: 97, end: 114 },
+  { name: "Cardiovascular — Heart Structure and Function", start: 115, end: 129 },
+  { name: "Cardiovascular — Measurements, BP and Adaptations", start: 130, end: 139 },
+  { name: "Cardiovascular — Blood Vessels and Blood", start: 140, end: 153 },
+  { name: "Respiratory System", start: 154, end: 177 },
+  { name: "Nervous System — Neuron, CNS, PNS, ANS", start: 178, end: 189 },
+  { name: "Muscle Fibre Types and DOMS", start: 190, end: 203 },
+  { name: "Muscle Tissue Types and Fascia", start: 204, end: 210 },
+  { name: "Yoga Application — Bandhas, Stretching, Asana", start: 211, end: 212 },
+  { name: "Muscles — Core (incl. pelvic floor, diaphragm)", start: 213, end: 230 },
+  { name: "Muscles — Hip and Leg", start: 231, end: 249 },
+  { name: "Muscles — Arm, Shoulder and Back", start: 250, end: 270 },
+  { name: "Joints, Cartilage and Synovial Structures", start: 271, end: 278 },
+  { name: "Skeletal System — Vertebral Column", start: 279, end: 285 },
+  { name: "Skeletal System — Bones and Skeleton Overview", start: 286, end: 302 },
+];
+
+const MOCK_PAPERS = [
+  { name: "Mock Paper 1", passScore: 14, questions: [
+    { num:1001, text:"Which of the following is a ligament that supports the spine?", options:["Posterior longitudinal ligament","Medial collateral ligament","Iliofemoral ligament","Anterior talofibular ligament"], correctIndex:0 },
+    { num:1002, text:"Which is a function of pulmonary circulation?", options:["To carry oxygenated blood from the heart to the lungs","To transfer deoxygenated blood to the body","To carry deoxygenated blood from the heart to the lungs","To transfer nutrients around the body"], correctIndex:2 },
+    { num:1003, text:"What is meant by cardiac output?", options:["The amount of blood pumped from the heart in 1 min","The amount of blood pumped from the heart in a given time period","The amount of blood pumped from the heart in one beat","The amount of blood pumped from the heart in 1 h"], correctIndex:0 },
+    { num:1004, text:"Where are the biceps brachii muscles located?", options:["Lower arm","Upper leg","Lower leg","Upper arm"], correctIndex:3 },
+    { num:1005, text:"What is one of the key functions of the core muscles?", options:["Stabilise the spine","Support the chest","Stabilise the hips","Support the upper back"], correctIndex:0 },
+    { num:1006, text:"Which of the following is a global (superficial) muscle that supports posture?", options:["Lumbar multifidus","Transverse abdominis","Pelvic floor","Erector spinae"], correctIndex:3 },
+    { num:1007, text:"Which of the following is most likely to cause delayed onset of muscular soreness (DOMS)?", options:["Activities that include a concentric training component","Activities that include a flexibility training component","Activities that include an eccentric training component","Activities that include a cardiovascular training component"], correctIndex:2 },
+    { num:1008, text:"What is one of the key functions of the pelvic floor muscles?", options:["Stability of the spine","Stability of the core","Support of the internal organs","Support of the trunk"], correctIndex:2 },
+    { num:1009, text:"Which muscle crosses the elbow joint?", options:["Levator scapula","Teres major","Biceps femoris","Triceps brachii"], correctIndex:3 },
+    { num:1010, text:"What must happen to start a muscle contraction?", options:["Stimulation of the muscle by an actin filament","Stimulation of the muscle by a myosin filament","Stimulation of the muscle by adenosine triphosphate","Stimulation of the muscle by a motor neuron impulse"], correctIndex:3 },
+    { num:1011, text:"Which of the following may occur as a result of a poor posture?", options:["Eye problems","Poor lung function","Stomach problems","Poor heart function"], correctIndex:1 },
+    { num:1012, text:"Which hormone controls calcium levels within the blood?", options:["Human growth hormone","Parathyroid hormone","Progesterone","Testosterone"], correctIndex:1 },
+    { num:1013, text:"Which muscle covers the posterior of the neck and shoulders?", options:["Trapezius","Lattisimus dorsi","Deltoid","Infraspinatus"], correctIndex:0 },
+    { num:1014, text:"Which of the following could be a cause of the postural deviation hyper-lordosis?", options:["Imbalance of hip flexors and trunk muscles","Imbalance of arm and shoulder muscles","Imbalance of chest and shoulder muscles","Imbalance of leg and arm muscles"], correctIndex:0 },
+    { num:1015, text:"Which gland releases melatonin to assist sleep?", options:["Parathyroid","Pituitary","Pineal","Pancreas"], correctIndex:2 },
+    { num:1016, text:"What type of 'strands' are Golgi tendon organs made from?", options:["Potassium strands","Calcium strands","Collagen strands","Sodium strands"], correctIndex:2 },
+    { num:1017, text:"Which muscle crosses both the hip and knee joint?", options:["Sartorius","Soleus","Subscapularis","Serratus anterior"], correctIndex:0 },
+    { num:1018, text:"What is the role of the autonomic nervous system?", options:["Conscious control of body functions such as heart rate and digestion","Unconscious control of movements such as smiling and walking","Conscious control of movements such as smiling and walking","Unconscious control of body functions such as heart rate and digestion"], correctIndex:3 },
+    { num:1019, text:"What is the name of the system comprised of hormone-producing glands?", options:["Endocrine","Nervous","Respiratory","Lymphatic"], correctIndex:0 },
+    { num:1020, text:"What is thickening and hardening of the artery walls known as?", options:["Arteriosclerosis","Osteoporosis","Atherosclerosis","Osteoarthritis"], correctIndex:0 }
+  ]},
+  { name: "Mock Paper 2", passScore: 14, questions: [
+    { num:2001, text:"Which of the following may occur as a result of a poor posture?", options:["Stomach problems","Poor heart function","Eye problems","Poor lung function"], correctIndex:3 },
+    { num:2002, text:"What is one of the functions of the thoracolumbar fascia (TLF)?", options:["Rotation of the spine","Back extension of the spine","Stabilisation of the spine","Lateral flexion of the spine"], correctIndex:2 },
+    { num:2003, text:"Which hormone regulates metabolism of all cells and tissues in the body?", options:["Oestrogen","Thyroxine","Cortisol","Insulin"], correctIndex:1 },
+    { num:2004, text:"Which of the following is a pelvic floor muscle?", options:["Levator scapula","Piriformis","Coccygeus","Erector spinae"], correctIndex:2 },
+    { num:2005, text:"The 'threshold response of each particular nerve cell and muscle fibre to a stimulus' is known as", options:["the 'sliding filament' theory","the 'proprioceptive neuromuscular facilitation'","the 'all-or-none' response","the 'reverse stretch reflex'"], correctIndex:2 },
+    { num:2006, text:"Which muscle crosses the knee joint?", options:["Piriformis","Tibialis anterior","Soleus","Rectus femoris"], correctIndex:3 },
+    { num:2007, text:"Which gland releases melatonin to assist sleep?", options:["Pineal","Parathyroid","Pituitary","Pancreas"], correctIndex:0 },
+    { num:2008, text:"What type of 'strands' are Golgi tendon organs made from?", options:["Sodium strands","Potassium strands","Calcium strands","Collagen strands"], correctIndex:3 },
+    { num:2009, text:"Which of the following is the cause of the birth defect achondroplasia?", options:["The muscles of the legs and arms do not form correctly","The muscles of the spine do not form correctly","The bone tissue of the hands and feet do not grow properly","The bone tissue of the leg and arm do not grow properly"], correctIndex:3 },
+    { num:2010, text:"When is delayed onset of muscular soreness (DOMS) typically experienced?", options:["Immediately after exercise","2–8 h after exercise","12–72 h after exercise","4–7 days after exercise"], correctIndex:2 },
+    { num:2011, text:"Which of the following is a primary core muscle?", options:["Trapezius","Tensor fascia lata","Transverse abdominis","Tibialis anterior"], correctIndex:2 },
+    { num:2012, text:"Which joint does the supraspinatus muscle cross?", options:["Elbow","Hip","Knee","Shoulder"], correctIndex:3 },
+    { num:2013, text:"What is meant by cardiac output?", options:["The amount of blood pumped from the heart in 1 min","The amount of blood pumped from the heart in one beat","The amount of blood pumped from the heart in 1 h","The amount of blood pumped from the heart in a given time period"], correctIndex:0 },
+    { num:2014, text:"Which muscle in the legs is the longest in the human body?", options:["Sartorius","Supraspinalis","Splenius capitis","Seratus anterior"], correctIndex:0 },
+    { num:2015, text:"What is thickening and hardening of the artery walls known as?", options:["Arteriosclerosis","Osteoarthritis","Atherosclerosis","Osteoporosis"], correctIndex:0 },
+    { num:2016, text:"Which is a function of pulmonary circulation?", options:["To carry oxygenated blood from the heart to the lungs","To carry deoxygenated blood from the heart to the lungs","To transfer nutrients around the body","To transfer deoxygenated blood to the body"], correctIndex:1 },
+    { num:2017, text:"Which local (deep) muscle supports posture?", options:["External obliques","Transverse abdominis","Erector spinae","Rectus abdominis"], correctIndex:1 },
+    { num:2018, text:"Which muscle covers the posterior of the neck and shoulders?", options:["Lattisimus dorsi","Trapezius","Infraspinatus","Deltoid"], correctIndex:1 },
+    { num:2019, text:"Which of the following is a role of the brain?", options:["Initiation of spinal reflexes","Interpretation of messages","Autonomic control","Transfer of messages"], correctIndex:1 },
+    { num:2020, text:"What is the name of the system comprised of hormone-producing glands?", options:["Nervous","Lymphatic","Respiratory","Endocrine"], correctIndex:3 }
+  ]},
+  { name: "Mock Paper 3", passScore: 14, questions: [
+    { num:3001, text:"What is the role of the autonomic nervous system?", options:["Conscious control of body functions such as heart rate and digestion","Conscious control of movements such as smiling and walking","Unconscious control of movements such as smiling and walking","Unconscious control of body functions such as heart rate and digestion"], correctIndex:3 },
+    { num:3002, text:"Which is a function of systemic circulation?", options:["To carry oxygenated blood away from the heart to the body","To carry deoxygenated blood away from the heart to the body","To transfer nutrients around the body","To transfer oxygenated blood back to the heart from the body"], correctIndex:0 },
+    { num:3003, text:"What system produces hormones that regulate metabolism, growth and development?", options:["Endocrine","Respiratory","Lymphatic","Nervous"], correctIndex:0 },
+    { num:3004, text:"What is one of the key functions of the pelvic floor muscles?", options:["Stability of the core","Support of the internal organs","Support of the trunk","Stability of the spine"], correctIndex:1 },
+    { num:3005, text:"Which hormone controls calcium levels within the blood?", options:["Progesterone","Human growth hormone","Testosterone","Parathyroid hormone"], correctIndex:3 },
+    { num:3006, text:"What is one of the key functions of the core muscles?", options:["Support the chest","Stabilise the spine","Support the upper back","Stabilise the hips"], correctIndex:1 },
+    { num:3007, text:"Where are the biceps brachii muscles located?", options:["Upper arm","Lower leg","Upper leg","Lower arm"], correctIndex:0 },
+    { num:3008, text:"Which local (deep) muscle supports posture?", options:["External obliques","Rectus abdominis","Transverse abdominis","Erector spinae"], correctIndex:2 },
+    { num:3009, text:"The function of a Golgi tendon organ is to", options:["sense the strength of a stretch","sense the speed of a stretch","sense changes in muscle tension","sense changes in muscle size"], correctIndex:2 },
+    { num:3010, text:"Which of the following may occur as a result of a poor posture?", options:["Stomach problems","Eye problems","Poor heart function","Poor lung function"], correctIndex:3 },
+    { num:3011, text:"What disease of the arteries is characterised by fatty material being deposited on their inner walls?", options:["Osteoarthritis","Osteoporosis","Arteriosclerosis","Atherosclerosis"], correctIndex:3 },
+    { num:3012, text:"Which of the following could be a cause of the postural deviation hyper-lordosis?", options:["Imbalance of hip flexors and trunk muscles","Imbalance of chest and shoulder muscles","Imbalance of leg and arm muscles","Imbalance of arm and shoulder muscles"], correctIndex:0 },
+    { num:3013, text:"Which of the following is most likely to cause delayed onset of muscular soreness (DOMS)?", options:["Activities that include a flexibility training component","Activities that include a cardiovascular training component","Activities that include an eccentric training component","Activities that include a concentric training component"], correctIndex:2 },
+    { num:3014, text:"Within the endocrine system, which gland is the 'master gland'?", options:["Pancreas","Pituitary","Adrenal","Thyroid"], correctIndex:1 },
+    { num:3015, text:"What is meant by cardiac output?", options:["The amount of blood pumped from the heart in 1 min","The amount of blood pumped from the heart in 1 h","The amount of blood pumped from the heart in a given time period","The amount of blood pumped from the heart in one beat"], correctIndex:0 },
+    { num:3016, text:"Which muscle crosses the knee joint?", options:["Rectus femoris","Soleus","Piriformis","Tibialis anterior"], correctIndex:0 },
+    { num:3017, text:"Which muscles are situated along each side of the spine?", options:["Erector spinae","Teres minor","Infraspinatus","Deltoid"], correctIndex:0 },
+    { num:3018, text:"What must happen to start a muscle contraction?", options:["Stimulation of the muscle by an actin filament","Stimulation of the muscle by a myosin filament","Stimulation of the muscle by adenosine triphosphate","Stimulation of the muscle by a motor neuron impulse"], correctIndex:3 },
+    { num:3019, text:"Which of the following is a ligament that supports the spine?", options:["Posterior longitudinal ligament","Medial collateral ligament","Iliofemoral ligament","Anterior talofibular ligament"], correctIndex:0 },
+    { num:3020, text:"Which muscle crosses the elbow joint?", options:["Teres major","Biceps femoris","Triceps brachii","Levator scapula"], correctIndex:2 }
+  ]},
+  { name: "Mock Paper 4", passScore: 14, questions: [
+    { num:4001, text:"Which of the following is a ligament that supports the spine?", options:["Iliofemoral ligament","Posterior longitudinal ligament","Medial collateral ligament","Anterior talofibular ligament"], correctIndex:1 },
+    { num:4002, text:"Which hormone regulates metabolism of all cells and tissues in the body?", options:["Insulin","Thyroxine","Cortisol","Oestrogen"], correctIndex:1 },
+    { num:4003, text:"When is delayed onset of muscular soreness (DOMS) typically experienced?", options:["Immediately after exercise","2–8 h after exercise","12–72 h after exercise","4–7 days after exercise"], correctIndex:2 },
+    { num:4004, text:"Which muscle in the legs is the longest in the human body?", options:["Splenius capitis","Sartorius","Supraspinalis","Seratus anterior"], correctIndex:1 },
+    { num:4005, text:"Which muscle crosses the elbow joint?", options:["Biceps femoris","Triceps brachii","Teres major","Levator scapula"], correctIndex:1 },
+    { num:4006, text:"What disease of the arteries is characterised by fatty material being deposited on their inner walls?", options:["Osteoporosis","Atherosclerosis","Arteriosclerosis","Osteoarthritis"], correctIndex:1 },
+    { num:4007, text:"Which is a function of systemic circulation?", options:["To carry deoxygenated blood away from the heart to the body","To transfer oxygenated blood back to the heart from the body","To carry oxygenated blood away from the heart to the body","To transfer nutrients around the body"], correctIndex:2 },
+    { num:4008, text:"Which spinal disorder may also be known as 'hunchback'?", options:["Hyper-kyphosis","Hyper-lordosis","Upper-cross syndrome","Lower-cross syndrome"], correctIndex:0 },
+    { num:4009, text:"Which muscles are situated along each side of the spine?", options:["Erector spinae","Teres minor","Infraspinatus","Deltoid"], correctIndex:0 },
+    { num:4010, text:"What must happen to start a muscle contraction?", options:["Stimulation of the muscle by a motor neuron impulse","Stimulation of the muscle by an actin filament","Stimulation of the muscle by a myosin filament","Stimulation of the muscle by adenosine triphosphate"], correctIndex:0 },
+    { num:4011, text:"What is the contraction phase of the cardiac cycle called?", options:["Diastole","Pulmonary","Systemic","Systole"], correctIndex:3 },
+    { num:4012, text:"Which of the following is the cause of the birth defect achondroplasia?", options:["The muscles of the legs and arms do not form correctly","The bone tissue of the hands and feet do not grow properly","The muscles of the spine do not form correctly","The bone tissue of the leg and arm do not grow properly"], correctIndex:3 },
+    { num:4013, text:"Which of the following is a pelvic floor muscle?", options:["Piriformis","Levator scapula","Coccygeus","Erector spinae"], correctIndex:2 },
+    { num:4014, text:"Which of the following is a role of the brain?", options:["Transfer of messages","Interpretation of messages","Autonomic control","Initiation of spinal reflexes"], correctIndex:1 },
+    { num:4015, text:"What system produces hormones that regulate metabolism, growth and development?", options:["Nervous","Endocrine","Lymphatic","Respiratory"], correctIndex:1 },
+    { num:4016, text:"Which local (deep) muscle supports posture?", options:["Erector spinae","Rectus abdominis","Transverse abdominis","External obliques"], correctIndex:2 },
+    { num:4017, text:"Which muscle crosses the knee joint?", options:["Tibialis anterior","Piriformis","Rectus femoris","Soleus"], correctIndex:2 },
+    { num:4018, text:"Within the endocrine system, which gland is the 'master gland'?", options:["Adrenal","Thyroid","Pancreas","Pituitary"], correctIndex:3 },
+    { num:4019, text:"The function of a Golgi tendon organ is to", options:["sense the speed of a stretch","sense the strength of a stretch","sense changes in muscle tension","sense changes in muscle size"], correctIndex:2 },
+    { num:4020, text:"Which of the following is a primary core muscle?", options:["Trapezius","Tensor fascia lata","Transverse abdominis","Tibialis anterior"], correctIndex:2 }
+  ]},
+  { name: "Mock Paper 5", passScore: 14, questions: [
+    { num:5001, text:"What system produces hormones that regulate metabolism, growth and development?", options:["Lymphatic","Endocrine","Nervous","Respiratory"], correctIndex:1 },
+    { num:5002, text:"What is the contraction phase of the cardiac cycle called?", options:["Diastole","Systole","Pulmonary","Systemic"], correctIndex:1 },
+    { num:5003, text:"The 'threshold response of each particular nerve cell and muscle fibre to a stimulus' is known as", options:["the 'proprioceptive neuromuscular facilitation'","the 'sliding filament' theory","the 'reverse stretch reflex'","the 'all-or-none' response"], correctIndex:3 },
+    { num:5004, text:"What disease of the arteries is characterised by fatty material being deposited on their inner walls?", options:["Arteriosclerosis","Atherosclerosis","Osteoporosis","Osteoarthritis"], correctIndex:1 },
+    { num:5005, text:"Which of the following is a primary core muscle?", options:["Trapezius","Tibialis anterior","Tensor fascia lata","Transverse abdominis"], correctIndex:3 },
+    { num:5006, text:"When is delayed onset of muscular soreness (DOMS) typically experienced?", options:["Immediately after exercise","2–8 h after exercise","12–72 h after exercise","4–7 days after exercise"], correctIndex:2 },
+    { num:5007, text:"What is the role of the autonomic nervous system?", options:["Conscious control of body functions such as heart rate and digestion","Unconscious control of movements such as smiling and walking","Conscious control of movements such as smiling and walking","Unconscious control of body functions such as heart rate and digestion"], correctIndex:3 },
+    { num:5008, text:"Within the endocrine system, which gland is the 'master gland'?", options:["Pancreas","Thyroid","Pituitary","Adrenal"], correctIndex:2 },
+    { num:5009, text:"Which is a function of systemic circulation?", options:["To transfer nutrients around the body","To carry deoxygenated blood away from the heart to the body","To carry oxygenated blood away from the heart to the body","To transfer oxygenated blood back to the heart from the body"], correctIndex:2 },
+    { num:5010, text:"The function of a Golgi tendon organ is to", options:["sense the speed of a stretch","sense the strength of a stretch","sense changes in muscle tension","sense changes in muscle size"], correctIndex:2 },
+    { num:5011, text:"Which of the following could be a cause of the postural deviation hyper-lordosis?", options:["Imbalance of arm and shoulder muscles","Imbalance of hip flexors and trunk muscles","Imbalance of chest and shoulder muscles","Imbalance of leg and arm muscles"], correctIndex:1 },
+    { num:5012, text:"Which joint does the supraspinatus muscle cross?", options:["Hip","Elbow","Knee","Shoulder"], correctIndex:3 },
+    { num:5013, text:"Where are the biceps brachii muscles located?", options:["Lower leg","Lower arm","Upper leg","Upper arm"], correctIndex:3 },
+    { num:5014, text:"Which local (deep) muscle supports posture?", options:["Rectus abdominis","Erector spinae","External obliques","Transverse abdominis"], correctIndex:3 },
+    { num:5015, text:"Which spinal disorder may also be known as 'hunchback'?", options:["Hyper-kyphosis","Upper-cross syndrome","Lower-cross syndrome","Hyper-lordosis"], correctIndex:0 },
+    { num:5016, text:"Which muscle crosses both the hip and knee joint?", options:["Soleus","Serratus anterior","Sartorius","Subscapularis"], correctIndex:2 },
+    { num:5017, text:"Which hormone controls calcium levels within the blood?", options:["Testosterone","Progesterone","Human growth hormone","Parathyroid hormone"], correctIndex:3 },
+    { num:5018, text:"Which of the following is a ligament that supports the spine?", options:["Anterior talofibular ligament","Posterior longitudinal ligament","Iliofemoral ligament","Medial collateral ligament"], correctIndex:1 },
+    { num:5019, text:"What is one of the key functions of the pelvic floor muscles?", options:["Support of the trunk","Stability of the core","Stability of the spine","Support of the internal organs"], correctIndex:3 },
+    { num:5020, text:"Which muscles are situated along each side of the spine?", options:["Deltoid","Erector spinae","Infraspinatus","Teres minor"], correctIndex:1 }
+  ]},
+  { name: "Tom's Mock", passScore: 17, questions: [
+    { num:6001, text:"Which type of joint is the shoulder joint?", options:["Hinge joint","Saddle joint","Ball and socket joint","Pivot joint"], correctIndex:2 },
+    { num:6002, text:"Which movement occurs in the sagittal plane?", options:["Rotation","Flexion and extension","Circumduction","Abduction"], correctIndex:1 },
+    { num:6003, text:"Which bone forms the lower arm on the thumb side?", options:["Scapula","Ulna","Radius","Humerus"], correctIndex:2 },
+    { num:6004, text:"Which muscle is primarily responsible for knee extension?", options:["Hamstrings","Gastrocnemius","Quadriceps","Gluteus Maximus"], correctIndex:2 },
+    { num:6005, text:"What is the role of a synergist muscle?", options:["Opposes movement","Stabilises joints only","Produces no movement","Assists the prime mover"], correctIndex:3 },
+    { num:6006, text:"Which muscle is responsible for Plantarflexion?", options:["Rectus Abdominis","Quadriceps","Soleus","Tibialis anterior"], correctIndex:2 },
+    { num:6007, text:"Which muscle is most associated with deep core stability?", options:["Rectus Abdominis","Transversus abdominis","Latissimus dorsi","Deltoid"], correctIndex:1 },
+    { num:6008, text:"Hyper Kyphosis refers to excessive curvature of which region?", options:["Cervical Spine","Lumbar Spine","Sacrum","Thoracic Spine"], correctIndex:3 },
+    { num:6009, text:"Which daily habit is likely to cause a postural abnormality?", options:["Prolonged sitting at a desk","Prolonged slouching on a sofa","Controlled hyperextension the spine","Sleeping on your side"], correctIndex:1 },
+    { num:6010, text:"Which chamber pumps oxygenated blood to the body?", options:["Right atrium","Right ventricle","Left atrium","Left ventricle"], correctIndex:3 },
+    { num:6011, text:"Which blood vessel carries blood AWAY from the heart?", options:["Vein","Capillary","Artery","Venule"], correctIndex:2 },
+    { num:6012, text:"What happens to stroke volume during exercise?", options:["Decreases","Stays the same","Increases","Stops"], correctIndex:2 },
+    { num:6013, text:"What decreases when doing cardiovascular exercise?", options:["Stroke Volume","Cardiac Output","Diastole","Heart Rate"], correctIndex:2 },
+    { num:6014, text:"Which blood vessels supply oxygenated blood directly to the heart muscle?", options:["Pulmonary arteries","Coronary arteries","Vena cava","Pulmonary veins"], correctIndex:1 },
+    { num:6015, text:"Which blood vessel supplies oxygenated blood to the anterior (front) surface of the left atrium and left ventricle?", options:["Left anterior descending artery","Circumflex artery","Right coronary artery","Carotid artery"], correctIndex:0 },
+    { num:6016, text:"Where does gaseous exchange occur?", options:["Bronchi","Alveoli","Trachea","Diaphragm"], correctIndex:1 },
+    { num:6017, text:"During inhalation the diaphragm:", options:["Relaxes upward","Contracts and flattens","Rotates","Stops moving"], correctIndex:1 },
+    { num:6018, text:"Which energy system predominates during short explosive activity?", options:["Aerobic system","ATP-PC system","Lactic acid system only","Oxidative phosphorylation"], correctIndex:1 },
+    { num:6019, text:"What is the main by-product of anaerobic glycolysis?", options:["Oxygen","Carbon dioxide only","Lactate","Glycogen"], correctIndex:2 },
+    { num:6020, text:"Which part of the nervous system controls voluntary movement?", options:["Autonomic nervous system","Somatic nervous system","Sympathetic nervous system","Parasympathetic nervous system"], correctIndex:1 },
+    { num:6021, text:"Which hormone increases heart rate during exercise?", options:["Insulin","Oestrogen","Adrenaline","Melatonin"], correctIndex:2 },
+    { num:6022, text:"What adaptation occurs with regular aerobic training?", options:["Decreased capillary density","Reduced stroke volume","Increased mitochondrial density","Reduced oxygen uptake"], correctIndex:2 },
+    { num:6023, text:"Tendons connect:", options:["Bone to bone","Muscle to bone","Muscle to muscle","Bone to cartilage"], correctIndex:1 },
+    { num:6024, text:"Abduction occurs when a limb moves:", options:["Towards midline","Away from midline","Forward","Backward"], correctIndex:1 }
+  ]}
+];
+
+function parseQuestions(raw) {
+  const questions = [];
+  const blocks = raw.split(/\n(?=Q\d+\.)/).map(b => b.trim()).filter(b => b);
+  for (const block of blocks) {
+    const lines = block.split('\n').map(l => l.trim()).filter(l => l);
+    if (!lines.length) continue;
+    const qMatch = lines[0].match(/^Q(\d+)\.\s*(.+)$/);
+    if (!qMatch) continue;
+    const num = parseInt(qMatch[1]);
+    const text = qMatch[2];
+    const options = [];
+    let correctIndex = -1;
+    for (let i = 1; i < lines.length; i++) {
+      const m = lines[i].match(/^([a-d])\)\s*(.+)$/);
+      if (!m) continue;
+      const raw_opt = m[2];
+      const isCorrect = raw_opt.includes('✓');
+      const clean = raw_opt.replace(/\s*✓\s*$/, '').trim();
+      if (isCorrect) correctIndex = options.length;
+      options.push(clean);
+    }
+    if (options.length === 4 && correctIndex !== -1) {
+      const topic = TOPICS.find(t => num >= t.start && num <= t.end);
+      questions.push({ num, text, options, correctIndex, topic: topic ? topic.name : 'General' });
+    }
+  }
+  return questions;
+}
+
+// ─── State ───────────────────────────────────────────────────────────────────
+let allQuestions = [];
+let activeTopicName = null;
+let queue = [];
+let retryPool = [];
+let currentQ = null;
+let score = 0;
+let answered = 0;
+let totalUnique = 0;
+let incorrectCount = 0;
+let uniqueSeen = 0;
+let inRetryRound = false;
+let sessionLog = [];     // [{qNum, topic|mock, correct}] — one entry per unique question, final outcome
+let retryAttempts = {};  // {qNum: retryCount} — cap per-session retries at 2
+let activeMockName = null;
+let activeMockPassScore = 14;
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+// ─── localStorage helpers ─────────────────────────────────────────────────────
+function loadStats() {
+  try {
+    const raw = localStorage.getItem('ytt_quiz_stats');
+    if (raw) {
+      const s = JSON.parse(raw);
+      if (!s.mocks) s.mocks = {};
+      return s;
+    }
+  } catch (e) {}
+  return { overall: { totalAttempts: 0, totalCorrect: 0, totalSessions: 0 }, topics: {}, mocks: {} };
+}
+
+function getMockStats(stats, name) {
+  if (!stats.mocks[name]) {
+    stats.mocks[name] = { sessions: 0, bestScore: 0, lastScore: 0, bestPct: 0, lastPct: 0 };
+  }
+  return stats.mocks[name];
+}
+
+function computeMockTrafficLight(ms) {
+  if (!ms || ms.sessions === 0) return 'grey';
+  if (ms.goldStar) return 'gold';
+  if (ms.bestScore >= 14) return 'green';   // pass = ≥70%
+  if (ms.bestScore >= 10) return 'amber';   // close
+  return 'red';
+}
+
+function saveStats(stats) {
+  try { localStorage.setItem('ytt_quiz_stats', JSON.stringify(stats)); } catch (e) {}
+}
+
+function getTopicStats(stats, name) {
+  if (!stats.topics[name]) {
+    stats.topics[name] = { sessions: 0, bestPct: 0, lastPct: 0, questions: {} };
+  }
+  return stats.topics[name];
+}
+
+function computeTrafficLight(topicStats) {
+  if (!topicStats || topicStats.sessions === 0) return 'grey';
+  if (topicStats.goldStar) return 'gold';
+  if (topicStats.bestPct >= 80) return 'green';
+  if (topicStats.bestPct >= 50) return 'amber';
+  return 'red';
+}
+
+function getTLHtml(tl) {
+  if (tl === 'gold') return `<span class="tl-star">★</span>`;
+  return `<span class="tl-dot tl-${tl}"></span>`;
+}
+
+// ─── Start screen ─────────────────────────────────────────────────────────────
+function renderStartScreen() {
+  const stats = loadStats();
+  renderOverallStats(stats);
+  renderMockSection(stats);
+  buildTopicGrid(stats);
+  document.getElementById('clear-progress-wrap').style.display = 'block';
+}
+
+function renderMockSection(stats) {
+  const grid = document.getElementById('mock-grid');
+  grid.innerHTML = '';
+  MOCK_PAPERS.forEach(paper => {
+    const ms = stats.mocks[paper.name];
+    const tl = computeMockTrafficLight(ms);
+    let scoreHTML;
+    if (!ms || ms.sessions === 0) {
+      scoreHTML = `<span class="mock-score not-started">Not started</span>`;
+    } else {
+      const passClass = ms.bestScore >= paper.passScore ? 'passed' : 'failed';
+      const qCount = paper.questions.length;
+      scoreHTML = `<span class="mock-score ${passClass}">${ms.lastScore}/${qCount} last &nbsp;·&nbsp; ${ms.bestScore}/${qCount} best</span>`;
+    }
+    const btn = document.createElement('button');
+    btn.className = 'mock-btn';
+    btn.innerHTML = `${getTLHtml(tl)}<span class="mock-btn-name">${paper.name}</span>${scoreHTML}<span class="mock-count">${paper.questions.length} Qs</span>`;
+    btn.onclick = () => startMock(paper.name);
+    grid.appendChild(btn);
+  });
+}
+
+function startMock(name) {
+  const paper = MOCK_PAPERS.find(p => p.name === name);
+  if (!paper) return;
+  activeMockName = name;
+  activeMockPassScore = paper.passScore;
+  activeTopicName = null;
+  // Mock questions need a mock property for sessionLog
+  const qs = paper.questions.map(q => Object.assign({}, q, { mock: name }));
+  initQuiz(qs);
+}
+
+function renderOverallStats(stats) {
+  const panel = document.getElementById('overall-stats-panel');
+  const o = stats.overall;
+
+  if (o.totalSessions === 0) {
+    panel.innerHTML = '<p class="no-sessions-msg">No sessions yet — start practising to track your progress!</p>';
+    document.getElementById('all-btn').textContent = 'Practice All 302 Questions';
+    return;
+  }
+
+  const acc = o.totalAttempts > 0 ? Math.round((o.totalCorrect / o.totalAttempts) * 100) : 0;
+  let greenCount = 0, amberCount = 0;
+  TOPICS.forEach(t => {
+    const tl = computeTrafficLight(stats.topics[t.name]);
+    if (tl === 'green') greenCount++;
+    else if (tl === 'amber') amberCount++;
+  });
+
+  panel.innerHTML = `
+    <div class="overall-stats-panel">
+      <div class="stat-chip"><span class="chip-val">${o.totalAttempts.toLocaleString()}</span><span>Answered</span></div>
+      <div class="stat-chip"><span class="chip-val">${acc}%</span><span>Accuracy</span></div>
+      <div class="stat-chip"><span class="chip-val" style="color:#38a169">${greenCount}</span><span>Mastered ≥80%</span></div>
+    </div>`;
+
+  // Update "all" button with overall badge
+  const allBtn = document.getElementById('all-btn');
+  const tlClass = computeTrafficLight({ sessions: o.totalSessions, bestPct: acc });
+  allBtn.innerHTML = `<span class="tl-dot tl-${tlClass}" style="margin-right:8px;vertical-align:middle"></span>Practice All 302 Questions <span style="opacity:0.75;font-weight:400;font-size:0.9rem;margin-left:6px">${acc}% overall</span>`;
+}
+
+function buildTopicGrid(stats) {
+  const grid = document.getElementById('topic-grid');
+  grid.innerHTML = '';
+  TOPICS.forEach(t => {
+    const count = t.end - t.start + 1;
+    const ts = stats.topics[t.name];
+    const tl = computeTrafficLight(ts);
+    const scoreHTML = (!ts || ts.sessions === 0)
+      ? `<span class="topic-score not-started">Not started</span>`
+      : `<span class="topic-score">${ts.lastPct}% last &nbsp;·&nbsp; ${ts.bestPct}% best</span>`;
+
+    const btn = document.createElement('button');
+    btn.className = 'topic-btn';
+    btn.innerHTML = `${getTLHtml(tl)}<span class="topic-btn-name">${t.name}</span>${scoreHTML}<span class="count">${count} Qs</span>`;
+    btn.onclick = () => startTopic(t.name);
+    grid.appendChild(btn);
+  });
+}
+
+function startAll() {
+  activeTopicName = null;
+  activeMockName = null;
+  initQuiz(allQuestions);
+}
+
+function startTopic(name) {
+  activeTopicName = name;
+  activeMockName = null;
+  const filtered = allQuestions.filter(q => q.topic === name);
+  initQuiz(filtered);
+}
+
+// ─── Quiz logic ───────────────────────────────────────────────────────────────
+function initQuiz(questionSet) {
+  queue = shuffle([...questionSet]);
+  retryPool = [];
+  score = 0;
+  answered = 0;
+  incorrectCount = 0;
+  totalUnique = questionSet.length;
+  uniqueSeen = 0;
+  inRetryRound = false;
+  sessionLog = [];
+  retryAttempts = {};
+
+  document.getElementById('start-screen').style.display = 'none';
+  document.getElementById('results-screen').style.display = 'none';
+  document.getElementById('quiz-screen').style.display = 'block';
+  document.getElementById('clear-progress-wrap').style.display = 'none';
+  document.getElementById('retry-banner').style.display = 'none';
+
+  const title = activeMockName ? activeMockName : activeTopicName ? activeTopicName : 'Anatomy & Physiology';
+  document.getElementById('quiz-title').textContent = title;
+
+  showNextQuestion();
+}
+
+function updateStats() {
+  if (inRetryRound) {
+    document.getElementById('q-current').textContent = 'Retry';
+  } else {
+    document.getElementById('q-current').textContent = uniqueSeen;
+  }
+  document.getElementById('q-total').textContent = totalUnique;
+  document.getElementById('q-score').textContent = score + '/' + answered;
+  const pct = totalUnique > 0 ? (uniqueSeen / totalUnique) * 100 : 0;
+  document.getElementById('progress-fill').style.width = pct + '%';
+}
+
+function showRetryRoundBanner() {
+  document.getElementById('retry-banner').style.display = 'block';
+}
+
+function showNextQuestion() {
+  let q = null;
+
+  if (queue.length > 0) {
+    q = queue.shift();
+    uniqueSeen++;
+  } else if (retryPool.length > 0 && !inRetryRound) {
+    inRetryRound = true;
+    shuffle(retryPool);
+    showRetryRoundBanner();
+    q = retryPool.shift();
+  } else if (retryPool.length > 0) {
+    q = retryPool.shift();
+  }
+
+  if (!q) { showResults(); return; }
+
+  currentQ = q;
+  document.getElementById('retry-meta').style.display = q._isRetry ? '' : 'none';
+  document.getElementById('q-text').textContent = q.text;
+
+  const container = document.getElementById('options-container');
+  container.innerHTML = '';
+  const shuffled = q.options
+    .map((text, origIdx) => ({ text, origIdx }))
+    .sort(() => Math.random() - 0.5);
+  shuffled.forEach(({ text, origIdx }, pos) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.textContent = String.fromCharCode(97 + pos) + ') ' + text;
+    btn.dataset.origIdx = origIdx;
+    btn.onclick = () => selectAnswer(origIdx);
+    container.appendChild(btn);
+  });
+
+  document.getElementById('feedback').style.display = 'none';
+  document.getElementById('next-btn').style.display = 'none';
+  updateStats();
+}
+
+function selectAnswer(origIdx) {
+  const q = currentQ;
+  const container = document.getElementById('options-container');
+  const buttons = Array.from(container.querySelectorAll('.option'));
+  buttons.forEach(b => b.disabled = true);
+
+  const clickedBtn = buttons.find(b => parseInt(b.dataset.origIdx) === origIdx);
+  const correctBtn = buttons.find(b => parseInt(b.dataset.origIdx) === q.correctIndex);
+  const correctPos = buttons.indexOf(correctBtn);
+
+  const isCorrect = origIdx === q.correctIndex;
+  answered++;
+
+  if (isCorrect) {
+    score++;
+    clickedBtn.classList.add('correct');
+    showFeedback(true, 'Correct!');
+  } else {
+    clickedBtn.classList.add('incorrect');
+    correctBtn.classList.add('reveal');
+    incorrectCount++;
+    showFeedback(false, 'The correct answer was: ' + String.fromCharCode(97 + correctPos) + ') ' + q.options[q.correctIndex]);
+    // Guard: cap each question at 2 retries per session
+    const retryCount = retryAttempts[q.num] || 0;
+    if (retryCount < 2) {
+      retryPool.push(Object.assign({}, q, { _isRetry: true }));
+      retryAttempts[q.num] = retryCount + 1;
+    }
+  }
+
+  // Update sessionLog — record per unique question (final outcome if retried)
+  if (!q._isRetry) {
+    sessionLog.push({ qNum: q.num, topic: q.topic || null, mock: q.mock || null, correct: isCorrect, firstAttemptCorrect: isCorrect });
+  } else {
+    if (isCorrect) {
+      const existing = sessionLog.find(e => e.qNum === q.num);
+      if (existing) existing.correct = true;
+    }
+  }
+
+  updateStats();
+  const nextBtn = document.getElementById('next-btn');
+  nextBtn.style.display = 'block';
+  nextBtn.textContent = (queue.length + retryPool.length > 0) ? 'Next Question →' : 'See Results →';
+}
+
+function showFeedback(correct, msg) {
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback ' + (correct ? 'correct' : 'incorrect');
+  fb.textContent = msg;
+  fb.style.display = 'block';
+}
+
+function nextQuestion() { showNextQuestion(); }
+
+// ─── Storage save ─────────────────────────────────────────────────────────────
+function saveSessionToStorage() {
+  if (sessionLog.length === 0) return;
+  const stats = loadStats();
+  const sessionCorrectTotal = sessionLog.filter(e => e.correct).length;
+
+  const firstAttemptTotal = sessionLog.filter(e => e.firstAttemptCorrect).length;
+  const isPerfectFirstAttempt = firstAttemptTotal === sessionLog.length;
+
+  if (activeMockName) {
+    // Mock paper session
+    const ms = getMockStats(stats, activeMockName);
+    const pct = Math.round((sessionCorrectTotal / sessionLog.length) * 100);
+    ms.lastScore = sessionCorrectTotal;
+    ms.lastPct = pct;
+    if (sessionCorrectTotal > ms.bestScore) ms.bestScore = sessionCorrectTotal;
+    if (pct > ms.bestPct) ms.bestPct = pct;
+    if (isPerfectFirstAttempt) ms.goldStar = true;
+    ms.sessions++;
+  } else {
+    // Topic / all-topics session — bucket by topic
+    const byTopic = {};
+    sessionLog.forEach(entry => {
+      const key = entry.topic || 'General';
+      if (!byTopic[key]) byTopic[key] = [];
+      byTopic[key].push(entry);
+    });
+
+    Object.entries(byTopic).forEach(([topicName, entries]) => {
+      const ts = getTopicStats(stats, topicName);
+      const sessionCorrect = entries.filter(e => e.correct).length;
+      const sessionPct = Math.round((sessionCorrect / entries.length) * 100);
+      const topicFirstAttempt = entries.filter(e => e.firstAttemptCorrect).length;
+
+      entries.forEach(entry => {
+        const qKey = String(entry.qNum);
+        if (!ts.questions[qKey]) ts.questions[qKey] = { attempts: 0, correct: 0 };
+        ts.questions[qKey].attempts++;
+        if (entry.correct) ts.questions[qKey].correct++;
+      });
+
+      ts.lastPct = sessionPct;
+      if (sessionPct > ts.bestPct) ts.bestPct = sessionPct;
+      if (topicFirstAttempt === entries.length) ts.goldStar = true;
+      ts.sessions++;
+    });
+  }
+
+  stats.overall.totalAttempts += sessionLog.length;
+  stats.overall.totalCorrect += sessionCorrectTotal;
+  stats.overall.totalSessions++;
+  saveStats(stats);
+}
+
+// ─── Results breakdown ────────────────────────────────────────────────────────
+function buildResultsTopicBreakdown(log) {
+  const byTopic = {};
+  log.forEach(entry => {
+    if (!byTopic[entry.topic]) byTopic[entry.topic] = { correct: 0, total: 0 };
+    byTopic[entry.topic].total++;
+    if (entry.correct) byTopic[entry.topic].correct++;
+  });
+
+  const rows = Object.entries(byTopic).map(([name, d]) => ({
+    name, pct: Math.round((d.correct / d.total) * 100), correct: d.correct, total: d.total
+  })).sort((a, b) => b.pct - a.pct);
+
+  const frag = document.createDocumentFragment();
+  const heading = document.createElement('div');
+  heading.className = 'rtb-heading';
+  heading.textContent = 'This session by topic';
+  frag.appendChild(heading);
+
+  rows.forEach(r => {
+    const tl = r.pct >= 80 ? 'green' : r.pct >= 50 ? 'amber' : 'red';
+    const row = document.createElement('div');
+    row.className = 'rtb-row';
+    row.innerHTML = `${getTLHtml(tl)}<span class="rtb-name">${r.name}</span><span class="rtb-pct pct-${tl}">${r.pct}%</span>`;
+    frag.appendChild(row);
+  });
+  return frag;
+}
+
+function showResults() {
+  saveSessionToStorage();
+
+  document.getElementById('quiz-screen').style.display = 'none';
+  document.getElementById('results-screen').style.display = 'block';
+
+  // Score is based on unique questions answered, not total attempts
+  const uniqueCorrect = sessionLog.filter(e => e.correct).length;
+  const uniqueTotal = sessionLog.length;
+  const pct = uniqueTotal > 0 ? Math.round((uniqueCorrect / uniqueTotal) * 100) : 0;
+
+  const firstAttemptCorrect = sessionLog.filter(e => e.firstAttemptCorrect).length;
+
+  document.getElementById('result-score').textContent = pct + '%';
+  document.getElementById('result-label').textContent = uniqueCorrect + ' correct out of ' + uniqueTotal + ' questions';
+  const faEl = document.getElementById('result-first-attempt');
+  const faPct = uniqueTotal > 0 ? Math.round((firstAttemptCorrect / uniqueTotal) * 100) : 0;
+  faEl.style.display = '';
+  faEl.textContent = 'First pass: ' + firstAttemptCorrect + '/' + uniqueTotal + ' · ' + faPct + '%';
+  document.getElementById('res-correct').textContent = uniqueCorrect;
+  document.getElementById('res-incorrect').textContent = uniqueTotal - uniqueCorrect;
+  document.getElementById('res-total').textContent = uniqueTotal;
+
+  // Pass/fail badge for mock papers
+  const passBadgeEl = document.getElementById('result-pass-badge');
+  if (activeMockName) {
+    const passed = uniqueCorrect >= activeMockPassScore;
+    const mockQCount = uniqueTotal;
+    passBadgeEl.innerHTML = `<span class="pass-badge ${passed ? 'pass' : 'fail'}">${passed ? '✓ PASS — ' + uniqueCorrect + '/' + mockQCount : '✗ Not yet — ' + uniqueCorrect + '/' + mockQCount + ' (need ' + activeMockPassScore + ')'}</span>`;
+    passBadgeEl.style.display = 'block';
+  } else {
+    passBadgeEl.style.display = 'none';
+  }
+
+  let emoji = '🌿';
+  if (pct >= 90) emoji = '🏆';
+  else if (pct >= 75) emoji = '🌟';
+  else if (pct >= 60) emoji = '💪';
+  else emoji = '📚';
+  document.getElementById('result-emoji').textContent = emoji;
+
+  // Per-topic breakdown (all-topics mode only, and only when there are multiple topics)
+  const topicBreakdown = document.getElementById('results-topic-breakdown');
+  const topicsInSession = new Set(sessionLog.map(e => e.topic).filter(Boolean)).size;
+  if (!activeTopicName && !activeMockName && topicsInSession > 1) {
+    topicBreakdown.innerHTML = '';
+    topicBreakdown.appendChild(buildResultsTopicBreakdown(sessionLog));
+    topicBreakdown.style.display = 'block';
+  } else {
+    topicBreakdown.style.display = 'none';
+  }
+}
+
+function restartQuiz() {
+  document.getElementById('results-screen').style.display = 'none';
+  if (activeMockName) {
+    startMock(activeMockName);
+  } else if (activeTopicName) {
+    startTopic(activeTopicName);
+  } else {
+    startAll();
+  }
+}
+
+function goToMenu() {
+  document.getElementById('results-screen').style.display = 'none';
+  document.getElementById('quiz-screen').style.display = 'none';
+  document.getElementById('start-screen').style.display = 'block';
+  renderStartScreen();
+}
+
+function clearProgress() {
+  if (confirm('Clear all progress and stats? This cannot be undone.')) {
+    try { localStorage.removeItem('ytt_quiz_stats'); } catch (e) {}
+    renderStartScreen();
+  }
+}
+
+// ─── Quit modal ───────────────────────────────────────────────────────────────
+function openQuitModal() {
+  document.getElementById('quit-modal').classList.add('open');
+}
+function closeQuitModal() {
+  document.getElementById('quit-modal').classList.remove('open');
+}
+function confirmQuit() {
+  closeQuitModal();
+  goToMenu();
+}
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+allQuestions = parseQuestions(RAW);
+renderStartScreen();
+</script>
+<script>
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
+</script>
+</body>
+</html>
