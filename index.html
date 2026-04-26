@@ -2548,7 +2548,7 @@ function renderOverallStats(stats) {
   // Update "all" button with overall badge
   const allBtn = document.getElementById('all-btn');
   const tlClass = computeTrafficLight({ sessions: o.totalSessions, bestPct: acc });
-  allBtn.innerHTML = `<span class="tl-dot tl-${tlClass}" style="margin-right:8px;vertical-align:middle"></span>Practice All 302 Questions <span style="opacity:0.75;font-weight:400;font-size:0.9rem;margin-left:6px">${acc}% overall</span>`;
+  allBtn.textContent = 'Practice All 302 Questions';
 }
 
 function buildTopicGrid(stats) {
