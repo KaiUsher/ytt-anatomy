@@ -204,6 +204,9 @@
   .topic-btn-name { flex: 1; text-align: left; }
   .topic-score { font-size: 0.72rem; font-weight: 400; color: var(--sf-ember); white-space: nowrap; margin-right: 10px; letter-spacing: 0.03em; }
   .topic-score.not-started { color: var(--sf-ash); font-weight: 300; }
+  .topic-score.passed { color: #5a8a5a; }
+  .topic-score.amber  { color: #c4832e; }
+  .topic-score.failed { color: #b85555; }
 
   /* Retry round banner */
   .retry-banner {
@@ -286,6 +289,24 @@
   }
   .pass-badge.pass { background: #f2f7f2; color: #2a4a2a; border: 0.5px solid #a8c8a8; }
   .pass-badge.fail { background: #faf2f2; color: #5a2a2a; border: 0.5px solid #d8a8a8; }
+
+  @media (max-width: 540px) {
+    body { padding: 10px; }
+    .card { padding: 16px; }
+    .topic-btn, .mock-btn {
+      display: grid;
+      grid-template-columns: 15px auto 1fr;
+      column-gap: 0;
+      row-gap: 2px;
+      align-items: baseline;
+    }
+    .topic-btn .tl-dot, .topic-btn .tl-star,
+    .mock-btn .tl-dot, .mock-btn .tl-star { grid-row: 1; grid-column: 1; margin-right: 0; }
+    .topic-btn-name, .mock-btn-name { grid-row: 1; grid-column: 2 / 4; padding-left: 8px; }
+    .topic-btn .count, .mock-count { grid-row: 2; grid-column: 2; padding-left: 8px; }
+    .topic-score, .mock-score { grid-row: 2; grid-column: 3; white-space: normal; margin-right: 0; }
+    .topic-score::before, .mock-score::before { content: "\00a0·\00a0"; }
+  }
 </style>
 </head>
 <body>
@@ -2537,9 +2558,10 @@ function buildTopicGrid(stats) {
     const count = t.end - t.start + 1;
     const ts = stats.topics[t.name];
     const tl = computeTrafficLight(ts);
+    const scoreClass = ts && ts.bestPct >= 80 ? 'passed' : ts && ts.bestPct >= 50 ? 'amber' : 'failed';
     const scoreHTML = (!ts || ts.sessions === 0)
       ? `<span class="topic-score not-started">Not started</span>`
-      : `<span class="topic-score">${ts.lastPct}% last &nbsp;·&nbsp; ${ts.bestPct}% best</span>`;
+      : `<span class="topic-score ${scoreClass}">${ts.lastPct}% last &nbsp;·&nbsp; ${ts.bestPct}% best</span>`;
 
     const btn = document.createElement('button');
     btn.className = 'topic-btn';
