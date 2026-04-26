@@ -2541,8 +2541,7 @@ function renderOverallStats(stats) {
   panel.innerHTML = `
     <div class="overall-stats-panel">
       <div class="stat-chip"><span class="chip-val">${o.totalAttempts.toLocaleString()}</span><span>Answered</span></div>
-      <div class="stat-chip"><span class="chip-val">${acc}%</span><span>Accuracy</span></div>
-      <div class="stat-chip"><span class="chip-val" style="color:#38a169">${greenCount}</span><span>Mastered ≥80%</span></div>
+      <div class="stat-chip"><span class="chip-val">${acc}%</span><span>Correct</span></div>
     </div>`;
 
   // Update "all" button with overall badge
