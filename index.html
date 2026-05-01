@@ -307,6 +307,17 @@
     .topic-score, .mock-score { grid-row: 2; grid-column: 3; white-space: normal; margin-right: 0; }
     .topic-score::before, .mock-score::before { content: "\00a0·\00a0"; }
   }
+  .tl-legend {
+    display: flex; flex-wrap: wrap; gap: 10px 16px;
+    margin-top: 28px; padding-top: 16px;
+    border-top: 0.5px solid var(--sf-mid);
+  }
+  .tl-legend-item {
+    display: flex; align-items: center; gap: 4px;
+    font-size: 0.72rem; color: var(--sf-ash); letter-spacing: 0.04em;
+  }
+  .tl-legend-item .tl-dot,
+  .tl-legend-item .tl-star { margin-right: 0; letter-spacing: 0.02em; font-size: 0.85rem; }
   #q-image {
     width: 100%; max-width: 340px; border-radius: 4px;
     margin: 0 auto 1rem; display: block;
@@ -333,6 +344,13 @@
       <div class="mock-grid" id="mock-grid"></div>
       <div class="section-heading" style="margin-top:28px">Or choose a topic</div>
       <div class="topic-grid" id="topic-grid"></div>
+      <div class="tl-legend">
+        <div class="tl-legend-item"><span class="tl-dot tl-grey"></span>Not started</div>
+        <div class="tl-legend-item"><span class="tl-dot tl-red"></span>Below 50%</div>
+        <div class="tl-legend-item"><span class="tl-dot tl-amber"></span>50 – 79%</div>
+        <div class="tl-legend-item"><span class="tl-dot tl-green"></span>70%+</div>
+        <div class="tl-legend-item"><span class="tl-star">★</span>100%</div>
+      </div>
     </div>
   </div>
 
@@ -2668,7 +2686,7 @@ function getTopicStats(stats, name) {
 function computeTrafficLight(topicStats) {
   if (!topicStats || topicStats.sessions === 0) return 'grey';
   if (topicStats.goldStar) return 'gold';
-  if (topicStats.bestPct >= 80) return 'green';
+  if (topicStats.bestPct >= 70) return 'green';
   if (topicStats.bestPct >= 50) return 'amber';
   return 'red';
 }
@@ -2694,9 +2712,9 @@ function buildClassroomQuizGrid(stats) {
   CLASSROOM_QUIZZES.forEach(quiz => {
     const ts = stats.topics['cq:' + quiz.name];
     const tl = computeTrafficLight(ts);
-    const scoreClass = ts && ts.bestPct >= 80 ? 'passed' : ts && ts.bestPct >= 50 ? 'amber' : 'failed';
+    const scoreClass = ts && ts.bestPct >= 70 ? 'passed' : ts && ts.bestPct >= 50 ? 'amber' : 'failed';
     const scoreHTML = (!ts || ts.sessions === 0)
-      ? `<span class="topic-score not-started">Not started</span>`
+      ? `<span class="topic-score not-started"></span>`
       : `<span class="topic-score ${scoreClass}">${ts.lastPct}% last &nbsp;·&nbsp; ${ts.bestPct}% best</span>`;
     const btn = document.createElement('button');
     btn.className = 'topic-btn';
@@ -2720,9 +2738,9 @@ function buildMuscleImageSection(stats) {
   section.innerHTML = '';
   const ts = stats.topics['Name the Muscle'];
   const tl = computeTrafficLight(ts);
-  const scoreClass = ts && ts.bestPct >= 80 ? 'passed' : ts && ts.bestPct >= 50 ? 'amber' : 'failed';
+  const scoreClass = ts && ts.bestPct >= 70 ? 'passed' : ts && ts.bestPct >= 50 ? 'amber' : 'failed';
   const scoreHTML = (!ts || ts.sessions === 0)
-    ? `<span class="topic-score not-started">Not started</span>`
+    ? `<span class="topic-score not-started"></span>`
     : `<span class="topic-score ${scoreClass}">${ts.lastPct}% last &nbsp;·&nbsp; ${ts.bestPct}% best</span>`;
   const btn = document.createElement('button');
   btn.className = 'topic-btn';
@@ -2739,7 +2757,7 @@ function renderMockSection(stats) {
     const tl = computeMockTrafficLight(ms);
     let scoreHTML;
     if (!ms || ms.sessions === 0) {
-      scoreHTML = `<span class="mock-score not-started">Not started</span>`;
+      scoreHTML = `<span class="mock-score not-started"></span>`;
     } else {
       const passClass = ms.bestScore >= paper.passScore ? 'passed' : 'failed';
       const qCount = paper.questions.length;
@@ -2801,9 +2819,9 @@ function buildTopicGrid(stats) {
     const count = t.end - t.start + 1;
     const ts = stats.topics[t.name];
     const tl = computeTrafficLight(ts);
-    const scoreClass = ts && ts.bestPct >= 80 ? 'passed' : ts && ts.bestPct >= 50 ? 'amber' : 'failed';
+    const scoreClass = ts && ts.bestPct >= 70 ? 'passed' : ts && ts.bestPct >= 50 ? 'amber' : 'failed';
     const scoreHTML = (!ts || ts.sessions === 0)
-      ? `<span class="topic-score not-started">Not started</span>`
+      ? `<span class="topic-score not-started"></span>`
       : `<span class="topic-score ${scoreClass}">${ts.lastPct}% last &nbsp;·&nbsp; ${ts.bestPct}% best</span>`;
 
     const btn = document.createElement('button');
