@@ -307,6 +307,12 @@
     .topic-score, .mock-score { grid-row: 2; grid-column: 3; white-space: normal; margin-right: 0; }
     .topic-score::before, .mock-score::before { content: "\00a0·\00a0"; }
   }
+  #q-image {
+    width: 100%; max-width: 340px; border-radius: 4px;
+    margin: 0 auto 1rem; display: block;
+    background: var(--sf-light);
+  }
+  #q-image[src=""] { display: none; }
 </style>
 </head>
 <body>
@@ -321,7 +327,9 @@
       <p class="start-subtitle">302 questions across 25 topics — YMCA Level 3 Applied Anatomy &amp; Physiology</p>
       <div id="overall-stats-panel"></div>
       <button class="all-btn" id="all-btn" onclick="startAll()">Practice All 302 Questions</button>
-      <div class="section-heading">Official Mock Papers</div>
+      <div class="section-heading">Classroom Quizzes</div>
+      <div class="topic-grid" id="classroom-quiz-grid"></div>
+      <div class="section-heading" style="margin-top:28px">Official Mock Papers</div>
       <div class="mock-grid" id="mock-grid"></div>
       <div class="section-heading" style="margin-top:28px">Or choose a topic</div>
       <div class="topic-grid" id="topic-grid"></div>
@@ -359,6 +367,7 @@
         <span id="retry-badge" class="retry-badge">Retry</span>
       </div>
       <div class="question-text" id="q-text"></div>
+      <img id="q-image" src="" alt="Muscle diagram">
       <div class="options" id="options-container"></div>
       <div class="feedback" id="feedback"></div>
       <button class="next-btn" id="next-btn" onclick="nextQuestion()">Next Question →</button>
@@ -2372,6 +2381,197 @@ const MOCK_PAPERS = [
   ]}
 ];
 
+const W = 'https://upload.wikimedia.org/wikipedia/commons/';
+const MUSCLE_IMAGE_QUESTIONS = [
+  // Core
+  { num:9001, imageUrl:W+'9/91/Gray397.png',           options:['Rectus abdominis','Transverse abdominis','Internal obliques','External obliques'], correctIndex:0, topic:'Name the Muscle' },
+  { num:9002, imageUrl:W+'e/e8/Gray392.png',           options:['External obliques','Internal obliques','Rectus abdominis','Transverse abdominis'], correctIndex:0, topic:'Name the Muscle' },
+  { num:9003, imageUrl:W+'2/2a/Gray395.png',           options:['Internal obliques','External obliques','Transverse abdominis','Rectus abdominis'], correctIndex:0, topic:'Name the Muscle' },
+  { num:9004, imageUrl:W+'8/80/Gray399.svg',           options:['Transverse abdominis','Internal obliques','Rectus abdominis','External obliques'], correctIndex:0, topic:'Name the Muscle' },
+  { num:9005, imageUrl:W+'0/08/Gray388.png',           options:['Quadratus lumborum','Psoas major','Iliacus','Multifidus'], correctIndex:0, topic:'Name the Muscle' },
+  { num:9006, imageUrl:W+'9/90/Gray389.png',           options:['Erector spinae','Multifidus','Quadratus lumborum','Iliocostalis'], correctIndex:0, topic:'Name the Muscle' },
+  { num:9007, imageUrl:W+'4/4d/Gray391.png',           options:['Diaphragm','Transverse abdominis','Internal obliques','Pelvic floor'], correctIndex:0, topic:'Name the Muscle' },
+  // Hip & Leg
+  { num:9008, imageUrl:W+'b/b2/Gray430.png',           options:['Psoas major','Iliacus','Sartorius','Rectus femoris'], correctIndex:0, topic:'Name the Muscle' },
+  { num:9009, imageUrl:W+'c/c6/Gluteus_maximus_muscle.PNG', options:['Gluteus maximus','Gluteus medius','Piriformis','Tensor fascia latae'], correctIndex:0, topic:'Name the Muscle' },
+  { num:9010, imageUrl:W+'5/5d/Gluteus_medius_muscle.PNG',  options:['Gluteus medius','Gluteus maximus','Gluteus minimus','Piriformis'], correctIndex:0, topic:'Name the Muscle' },
+  { num:9011, imageUrl:W+'e/eb/Gluteus_minimus_muscle.PNG', options:['Gluteus minimus','Gluteus medius','Piriformis','Pectineus'], correctIndex:0, topic:'Name the Muscle' },
+  { num:9012, imageUrl:W+'9/93/Piriformis_muscle.PNG', options:['Piriformis','Gluteus medius','Gluteus minimus','Obturator internus'], correctIndex:0, topic:'Name the Muscle' },
+  { num:9013, imageUrl:W+'8/85/Grays_anatomy_1918_plate_434_biceps_femoris_muscle_both_heads_marked.png', options:['Biceps femoris','Semimembranosus','Semitendinosus','Gracilis'], correctIndex:0, topic:'Name the Muscle' },
+  { num:9014, imageUrl:W+'d/dc/Gray1239.png',          options:['Gastrocnemius','Soleus','Plantaris','Tibialis posterior'], correctIndex:0, topic:'Name the Muscle' },
+  { num:9015, imageUrl:W+'1/19/Gray438.png',           options:['Soleus','Gastrocnemius','Plantaris','Flexor digitorum longus'], correctIndex:0, topic:'Name the Muscle' },
+  { num:9016, imageUrl:W+'0/09/Gray1240.png',          options:['Tibialis anterior','Peroneus longus','Extensor digitorum longus','Tibialis posterior'], correctIndex:0, topic:'Name the Muscle' },
+  { num:9017, imageUrl:W+'4/4b/Gray1238.png',          options:['Vastus medialis','Rectus femoris','Vastus lateralis','Sartorius'], correctIndex:0, topic:'Name the Muscle' },
+  { num:9018, imageUrl:W+'0/02/Gray433.png',           options:['Pectineus','Adductor longus','Gracilis','Psoas major'], correctIndex:0, topic:'Name the Muscle' },
+  // Arm, Shoulder & Back
+  { num:9019, imageUrl:W+'9/95/Gray409.png',           options:['Trapezius','Latissimus dorsi','Rhomboid major','Levator scapulae'], correctIndex:0, topic:'Name the Muscle' },
+  { num:9020, imageUrl:W+'8/8f/Gray412.png',           options:['Deltoid','Teres major','Infraspinatus','Supraspinatus'], correctIndex:0, topic:'Name the Muscle' },
+  { num:9021, imageUrl:W+'d/de/Gray410.png',           options:['Pectoralis major','Pectoralis minor','Serratus anterior','Deltoid'], correctIndex:0, topic:'Name the Muscle' },
+  { num:9022, imageUrl:W+'f/f2/Gray411.png',           options:['Pectoralis minor','Pectoralis major','Serratus anterior','Subscapularis'], correctIndex:0, topic:'Name the Muscle' },
+  { num:9023, imageUrl:W+'6/6f/Latissimus_dorsi.PNG',  options:['Latissimus dorsi','Trapezius','Teres major','Rhomboid major'], correctIndex:0, topic:'Name the Muscle' },
+  { num:9024, imageUrl:W+'a/ad/Musculus_rhomboideus_major.PNG', options:['Rhomboid major','Rhomboid minor','Trapezius','Levator scapulae'], correctIndex:0, topic:'Name the Muscle' },
+  { num:9025, imageUrl:W+'5/55/Gray_%E2%80%94_musculus_supraspinatus.png',   options:['Supraspinatus','Infraspinatus','Teres minor','Subscapularis'], correctIndex:0, topic:'Name the Muscle' },
+  { num:9026, imageUrl:W+'2/2b/Gray_%E2%80%94_musculus_infraspinatus.png',   options:['Infraspinatus','Supraspinatus','Teres minor','Subscapularis'], correctIndex:0, topic:'Name the Muscle' },
+  { num:9027, imageUrl:W+'8/8e/Gray_%E2%80%94_musculus_subscapularis.png',   options:['Subscapularis','Supraspinatus','Infraspinatus','Teres minor'], correctIndex:0, topic:'Name the Muscle' },
+  { num:9028, imageUrl:W+'6/6c/Gray_%E2%80%94_musculus_teres_minor.png',     options:['Teres minor','Teres major','Infraspinatus','Subscapularis'], correctIndex:0, topic:'Name the Muscle' },
+  { num:9029, imageUrl:W+'c/c2/Gray_%E2%80%94_musculus_teres_major.png',     options:['Teres major','Teres minor','Latissimus dorsi','Infraspinatus'], correctIndex:0, topic:'Name the Muscle' },
+  { num:9030, imageUrl:W+'2/2d/Gray_%E2%80%94_musculus_biceps_brachii.png',  options:['Biceps brachii','Brachialis','Brachioradialis','Coracobrachialis'], correctIndex:0, topic:'Name the Muscle' },
+  { num:9031, imageUrl:W+'e/e3/Gray_%E2%80%94_musculus_brachialis.png',      options:['Brachialis','Biceps brachii','Brachioradialis','Triceps brachii'], correctIndex:0, topic:'Name the Muscle' },
+  { num:9032, imageUrl:W+'f/f6/Gray_%E2%80%94_musculus_brachioradialis.png', options:['Brachioradialis','Brachialis','Biceps brachii','Extensor carpi radialis'], correctIndex:0, topic:'Name the Muscle' },
+  { num:9033, imageUrl:W+'e/eb/Gray_%E2%80%94_musculus_triceps_brachii.png', options:['Triceps brachii','Brachialis','Deltoid','Teres major'], correctIndex:0, topic:'Name the Muscle' },
+];
+
+const CLASSROOM_QUIZZES = [
+  { name: 'Axial and Appendicular Skeleton', questions: [
+    { num:7001, text:'Which region of the vertebral column is found within the neck?', options:['Thoracic','Cervical','Lumbar','Sacral'], correctIndex:1 },
+    { num:7002, text:'How many bones are there in the human skeleton?', options:['106','206','260','160'], correctIndex:1 },
+    { num:7003, text:'Which division of the human skeleton is responsible for allowing a large range of motion in the body?', options:['Appendicular Skeleton','Axial Skeleton'], correctIndex:0 },
+    { num:7004, text:'Which bones are found in the ankles?', options:['Metatarsals','Tarsals','Metacarpals','Carpals'], correctIndex:1 },
+    { num:7005, text:'What is the shape of the bones found in the ankles and wrists?', options:['Long','Irregular','Short','Flat'], correctIndex:2 },
+    { num:7006, text:'Which region of the vertebral column is found within the lower back?', options:['Sacral','Thoracic','Cervical','Lumbar'], correctIndex:3 },
+    { num:7007, text:'What is the name for the type of bone commonly called the kneecaps?', options:['Short','Flat','Sesamoid','Irregular'], correctIndex:2 },
+    { num:7008, text:'Which region of the vertebral column is found within the upper back?', options:['Lumbar','Cervical','Sacral','Thoracic'], correctIndex:3 },
+  ]},
+  { name: 'Bone and Joint Anatomy', questions: [
+    { num:7009, text:'Which word describes the rounded end of a long bone?', options:['Epiphyses','Periosteum','Diaphysis','Medullary Cavity'], correctIndex:0 },
+    { num:7010, text:'Which part of a long bone is responsible for the production of blood cells?', options:['Periosteum','Red marrow in cancellous bone','Compact bone','Yellow marrow in the medullary cavity'], correctIndex:1 },
+    { num:7011, text:'Resistance and light impact exercise increase the production of what in the skeleton?', options:['Osteoarthritis','Osteoblasts','Osteoclasts','Osteoporosis'], correctIndex:1 },
+    { num:7012, text:'Which word describes "the natural loss of bone mineral density that occurs with age"?', options:['Osteoarthritis','Osteoblasts','Osteoclasts','Osteoporosis'], correctIndex:3 },
+    { num:7013, text:'What part of a synovial joint is responsible for covering the ends of the articulating bones preventing friction?', options:['Bursa','Joint Cavity','Synovial Fluid','Articular Cartilage'], correctIndex:3 },
+    { num:7014, text:'Which of the following factors would have a positive effect on joint mobility?', options:['Increased joint temperature','Increased depth of joint cavity','Older age','Previous Injury'], correctIndex:0 },
+    { num:7015, text:'Based on genetics who is likely to have a greater Q-angle at the hip?', options:['Males','Females'], correctIndex:1 },
+    { num:7016, text:'With regular exercise what will make connective tissues stronger?', options:['Protein','Collagen','Calcium','Fats'], correctIndex:1 },
+  ]},
+  { name: 'Core Muscles', questions: [
+    { num:7017, text:'Which muscle is primarily responsible for the extension of the spine?', options:['Erector Spinae','External Obliques','Internal Oblique','Rectus Abdominis'], correctIndex:0 },
+    { num:7018, text:'What is the major joint action of the Quadratus Lumborum?', options:['Lateral Flexion','Flexion','Extension','Abduction'], correctIndex:0 },
+    { num:7019, text:'Which muscle helps to create compression of the abdominal cavity?', options:['Obliques','Rectus Abdominis','Erector Spinae','Transverse Abdominis'], correctIndex:3 },
+    { num:7020, text:'Which muscle helps to create rotation in the torso?', options:['Transverse Abdominis','Obliques','Erector Spinae','Rectus Abdominis'], correctIndex:1 },
+    { num:7021, text:'Which muscle is primarily responsible for producing flexion in the torso?', options:['Rectus Abdominis','Erector Spinae','Transverse Abdominis','Internal Obliques'], correctIndex:0 },
+  ]},
+  { name: 'Pelvis and Leg Muscles', questions: [
+    { num:7022, text:'Which muscle is primarily responsible for producing flexion at the knee?', options:['Hamstrings','Quadriceps','Iliopsoas','Gracilis'], correctIndex:0 },
+    { num:7023, text:'The Soleus muscle produces which joint action?', options:['Flexion of the knee','Dorsi Flexion','Plantar Flexion','Extension of the knee'], correctIndex:2 },
+    { num:7024, text:'The Psoas Major produces which joint action?', options:['Flexion of the hip','Adduction of the hip','Extension of the hip','Abduction of the hip'], correctIndex:0 },
+    { num:7025, text:'Which muscle produces abduction at the hip?', options:['Gracilis','Adductor Magnus','Gastrocnemius','Tensor Fascia Latae'], correctIndex:3 },
+    { num:7026, text:'Which one of the four Quadricep muscles produce flexion of the hip?', options:['Vastus Medialis','Vastus Lateralis','Rectus Femoris','Vastus Intermedius'], correctIndex:2 },
+    { num:7027, text:'Which muscle contracts to produce adduction at the hip?', options:['Pectineus','Piriformis','Psoas Major','Tensor Fascia Latae'], correctIndex:0 },
+  ]},
+  { name: 'Shoulder and Arm Muscles', questions: [
+    { num:7028, text:'Which muscle works with the trapezius to produce retraction at the shoulder blades?', options:['Levator Scapulae','Latissimus Dorsi','Rhomboids','Serratus Anterior'], correctIndex:2 },
+    { num:7029, text:'Which one of the rotator cuff muscles produces abduction of the arm?', options:['Infraspinatus','Supraspinatus','Teres Minor','Subscapularis'], correctIndex:1 },
+    { num:7030, text:'Which rotator cuff muscle produces medial rotation of the shoulder joint?', options:['Teres Minor','Supraspinatus','Infraspinatus','Subscapularis'], correctIndex:3 },
+    { num:7031, text:'Abduction of the arm is produced by which of the following muscles?', options:['Pectoralis Major','Trapezius','Deltoid','Latissimus Dorsi'], correctIndex:2 },
+    { num:7032, text:'Which muscle helps to produce supination at the forearm?', options:['Biceps Brachii','Biceps Brachialis','Triceps Brachii','Brachioradialis'], correctIndex:0 },
+  ]},
+  { name: 'Muscle Functions', questions: [
+    { num:7033, text:'Which term refers to the muscle that acts as a prime mover when doing exercise?', options:['Fixator','Synergist','Agonist','Antagonist'], correctIndex:2 },
+    { num:7034, text:'Which term refers to a muscle that supports the prime mover when doing exercise?', options:['Antagonist','Fixator','Agonist','Synergist'], correctIndex:3 },
+    { num:7035, text:'Which term refers to the muscle that holds bones still to enhance posture during exercise?', options:['Agonist','Synergist','Fixator','Antagonist'], correctIndex:2 },
+    { num:7036, text:'Which type of muscular contraction refers to tension in the muscle as it lengthens?', options:['Isometric','Concentric','Eccentric','Isokinetic'], correctIndex:2 },
+    { num:7037, text:'Which type of muscular contraction occurs when there is tension in the muscle but no change in length?', options:['Eccentric','Concentric','Isokinetic','Isometric'], correctIndex:3 },
+    { num:7038, text:'During a plank exercise, what type of muscle contraction would be occurring in the abdominal muscles?', options:['Isometric','Concentric','Eccentric','Isokinetic'], correctIndex:0 },
+    { num:7039, text:'During the downwards phase of a standing squat, what type of muscle contraction would occur in the quadriceps muscle?', options:['Concentric','Isometric','Isokinetic','Eccentric'], correctIndex:3 },
+  ]},
+  { name: 'Muscle Fibres', questions: [
+    { num:7040, text:'What is the appearance of skeletal muscles up close under a microscope?', options:['Striated','Smooth','Striated and Smooth','Cartilaginous'], correctIndex:0 },
+    { num:7041, text:'Which type of connective tissue connects muscle tissue to muscle tissue?', options:['Ligaments','Tendons','Aponeurosis','Fascia'], correctIndex:3 },
+    { num:7042, text:'Which layer of fascia surrounds the whole of a muscle?', options:['Perimysium','Epimysium','Muscle fibre','Endomysium'], correctIndex:1 },
+    { num:7043, text:'Which muscle fibre type would be most suited to endurance exercise?', options:['Type 2b','Type 2a','Type 2c','Type 1'], correctIndex:3 },
+    { num:7044, text:'Which muscle fibre type would have the highest density of mitochondria?', options:['Type 2a','Type 2c','Type 1','Type 2b'], correctIndex:2 },
+    { num:7045, text:'Which muscle fibre type would be most responsive to hypertrophy?', options:['Type 2c','Type 1','Type 2b','Type 2a'], correctIndex:2 },
+    { num:7046, text:'Which muscle fibre type would be most suited to high intensity / short duration exercise?', options:['Type 2a','Type 2c','Type 1','Type 2b'], correctIndex:3 },
+    { num:7047, text:'Which muscle fibre has the most potential to adapt to training stimulus?', options:['Type 2b','Type 2a','Type 2c','Type 1'], correctIndex:2 },
+  ]},
+  { name: 'Posture and the Core', questions: [
+    { num:7048, text:'What is one of the main functions of the thoracolumbar fascia?', options:['Lateral flexion of the spine','Extension of the spine','Rotation of the torso','Stabilisation of the spine'], correctIndex:3 },
+    { num:7049, text:'Which of the following ligaments of the vertebrae sits on the front side of each vertebra?', options:['Ligamentum flavum','Anterior longitudinal ligament','Supraspinous ligament','Posterior longitudinal ligament'], correctIndex:1 },
+    { num:7050, text:'Which of the following muscles offers lateral support to the stability of the core?', options:['Internal & External Obliques','Transverse abdominis','Pelvic Floor','Diaphragm'], correctIndex:0 },
+    { num:7051, text:'Which of the following muscles offers inferior support to the stability of the core?', options:['Pelvic Floor','Diaphragm','Internal and External Obliques','Quadratus Lumborum'], correctIndex:0 },
+    { num:7052, text:'Which of the following muscles offers anterior support to the stability of the core?', options:['Quadratus Lumborum','Rectus Abdominis','Multifidus','Diaphragm'], correctIndex:1 },
+    { num:7053, text:'Why do the pelvic floor muscles contain type 1 muscle fibres?', options:['Reflexive resistance to increased abdominal pressure','Ability to respond effectively to forced expiration','Continence control of urine and faeces','Coping mechanisms for coughing / sneezing'], correctIndex:2 },
+  ]},
+  { name: 'Postural Deviations', questions: [
+    { num:7054, text:'Which condition of the vertebrae presents itself with an exaggerated thoracic curve?', options:['Lordosis','Kyphosis','Scoliosis','Flat back'], correctIndex:1 },
+    { num:7055, text:'Which condition of the vertebrae presents itself with an exaggerated lumbar curve?', options:['Scoliosis','Flat Back','Lordosis','Kyphosis'], correctIndex:2 },
+    { num:7056, text:'Which condition of the vertebrae presents itself with a twisted curve in the vertebrae?', options:['Kyphosis','Scoliosis','Flat Back','Lordosis'], correctIndex:1 },
+    { num:7057, text:'Which of the following could result in the postural deviation called lordosis?', options:['Imbalance of hip flexors and core muscles','Imbalance of chest and shoulder muscles','Imbalance of chest and arm muscles','Imbalance of leg and arm muscles'], correctIndex:0 },
+    { num:7058, text:'Which of the following could result in the postural deviation called kyphosis?', options:['Imbalance of chest and upper back muscles','Muscle stiffness on one lateral side of the body','Increased weight of the abdomen (Pregnancy / Obesity)','Imbalance of hip flexors and core muscles'], correctIndex:0 },
+    { num:7059, text:'What type of corrective exercise would be best suited for a client with lordosis?', options:['Core strengthening exercises','Hip flexor strengthening exercises','Unilateral strength training exercises','Upper back strength training exercises'], correctIndex:0 },
+    { num:7060, text:'What sort of stretch would be best suited to support a client with kyphosis?', options:['Latissimus Dorsi Stretch','Erector Spinae Stretch','Quadratus Lumborum Stretch','Pectoral Major Stretch'], correctIndex:3 },
+    { num:7061, text:'Which of the medical conditions below is most likely to be caused by injury?', options:['Osteoarthritis','Spondylolisthesis','Herniated Disc','Ankylosing Spondylitis'], correctIndex:1 },
+  ]},
+  { name: 'The Heart and Exercise', questions: [
+    { num:7062, text:'What is the name of the valve located between the left atrium and left ventricle?', options:['Aortic Valve','Bicuspid Valve','Tricuspid Valve','Pulmonary Valve'], correctIndex:1 },
+    { num:7063, text:'Which one of the following valves prevents back flow of blood into the left ventricle?', options:['Bicuspid Valve','Tricuspid Valve','Pulmonary Valve','Aortic Valve'], correctIndex:3 },
+    { num:7064, text:'Which statement best describes the response of the heart to cardiovascular exercise?', options:['An increase in systolic and diastolic blood pressure','A decrease in systolic and diastolic blood pressure','An increase in diastolic blood pressure whilst systolic remains the same','An increase in systolic blood pressure whilst diastolic remains the same'], correctIndex:3 },
+    { num:7065, text:'Which term accurately describes the amount of blood pumped by the heart in one beat?', options:['Cardiac Output','Heart Rate','Stroke Volume','Cardiac Cycle'], correctIndex:2 },
+    { num:7066, text:'What is meant by the term cardiac output (Q)?', options:['The amount of blood pumped by the heart in one beat','The amount of blood pumped by the heart in one minute','The amount of blood pumped by the heart in one hour','The amount of blood pumped by the heart in one cardiac cycle'], correctIndex:1 },
+    { num:7067, text:'What is the primary function of the pulmonary circulation?', options:['To deliver oxygenated blood to the working muscles of the body','To deliver deoxygenated blood from the body to the heart','To deliver oxygenated blood from the lungs to the heart','To deliver nutrients around the body'], correctIndex:2 },
+    { num:7068, text:'What is the purpose of the systematic circulation?', options:['To deliver deoxygenated blood from the body to the lungs','To deliver oxygenated blood from the lungs to the heart','To deliver oxygenated blood to the working muscles of the body','To deliver deoxygenated blood to the working muscles of the body'], correctIndex:2 },
+    { num:7069, text:'Which term accurately describes the contraction phase of the cardiac cycle?', options:['Pulmonary','Diastolic','Systemic','Systole'], correctIndex:3 },
+  ]},
+  { name: 'Blood Vessels and Training', questions: [
+    { num:7070, text:'Which one of the following blood vessels is responsible for gaseous exchange in the body?', options:['Arteries','Venules','Arterioles','Capillaries'], correctIndex:3 },
+    { num:7071, text:'Which one of the following blood vessels has the thickest muscular wall inside it?', options:['Veins','Arteries','Venules','Capillaries'], correctIndex:1 },
+    { num:7072, text:'Which blood vessel has the lowest amount of pressure within it?', options:['Venules','Arterioles','Capillaries','Arteries'], correctIndex:0 },
+    { num:7073, text:'How does the vascular system increase blood flow to a specific area of the body?', options:['By vasoconstriction of arterioles leading to that area','By vasodilation of venules leading to that area','By vasoconstriction of venules leading to that area','By vasodilation of arterioles leading to that area'], correctIndex:3 },
+    { num:7074, text:'Which vessel gives blood flow to the posterior portion of the left atrium and left ventricle?', options:['Left circumflex artery','Right coronary artery','Left anterior descending artery','Pulmonary artery'], correctIndex:0 },
+    { num:7075, text:'Which type of fat is stored within the walls of the blood vessels?', options:['Visceral','Subcutaneous','Cholesterol','Intramuscular'], correctIndex:2 },
+    { num:7076, text:'Which chamber will adapt (hypertrophy) the most in response to cardiovascular exercise?', options:['Right Atrium','Left Atrium','Left Ventricle','Right Ventricle'], correctIndex:2 },
+    { num:7077, text:'Which adaptation accurately describes the heart\'s response to regular aerobic exercise?', options:['Increase in resting cardiac output','Decrease in resting stroke volume','Decrease in resting cardiac output','Decrease in resting heart rate'], correctIndex:3 },
+    { num:7078, text:'What is the function of the coronary arteries?', options:['They prevent back-flow of blood to the myocardium','They maintain oxygen supply to the myocardium','They clear waste products from the myocardium','They control the contractions of the myocardium'], correctIndex:1 },
+  ]},
+  { name: 'Respiratory System', questions: [
+    { num:7079, text:'Which structure contains the vocal cords allowing the production of sound?', options:['Pharynx','Epiglottis','Larynx','Trachea'], correctIndex:2 },
+    { num:7080, text:'Which structure is made of thick cartilage rings?', options:['Bronchus','Alveoli','Pharynx','Trachea'], correctIndex:3 },
+    { num:7081, text:'Which process accurately describes what is happening inside the alveoli of the lungs?', options:['Oxygen moves from the capillary into the alveoli','Oxygen moves from the alveoli into the capillary','Carbon dioxide moves from the alveoli into the capillary','Carbon dioxide stays in the capillaries'], correctIndex:1 },
+    { num:7082, text:'Which answer correctly explains what the internal intercostals do during forced expiration?', options:['They contract to compress the rib cage','They contract to expand the rib cage','They relax to compress the rib cage','They relax to expand the rib cage'], correctIndex:0 },
+    { num:7083, text:'Which muscle enables you to take larger breaths during exercise when inspiring?', options:['Pectoralis Major','Trapezius','Scalene','Rectus Abdominis'], correctIndex:2 },
+    { num:7084, text:'What is the accurate definition for "maximum amount of air you can expire in one breath"?', options:['Tidal Volume','Vital Capacity','Stroke Volume','Residual Volume'], correctIndex:1 },
+  ]},
+  { name: 'The Autonomic Nervous System', questions: [
+    { num:7085, text:'Which one of the options below best describes the brain and spinal cord?', options:['Peripheral Nervous System','Sympathetic Nervous System','Central Nervous System','Parasympathetic Nervous System'], correctIndex:2 },
+    { num:7086, text:'Which nerves send outgoing instructions from the brain to the body?', options:['Afferent Nerves','Efferent Nerves'], correctIndex:1 },
+    { num:7087, text:'What is the function of the spinal cord?', options:['To transmit information','To supply blood and nutrients','To supply hormones','To help support the vertebral column'], correctIndex:0 },
+    { num:7088, text:'Which of the following would slow down breathing rate after exercise?', options:['Parasympathetic action of the somatic nervous system','Sympathetic action of the somatic nervous system','Parasympathetic action of the autonomic nervous system','Sympathetic action of the autonomic nervous system'], correctIndex:2 },
+    { num:7089, text:'Which statement describes dendrites?', options:['Tree like extensions that receive information','The gap between two nerve cells','The fatty sheath which surrounds the axon','An elongated fibre that transmits information'], correctIndex:0 },
+    { num:7090, text:'Which of the following is a structure located within a nerve cell body?', options:['Axon','Muscle fibre','Nucleus','Dendrite'], correctIndex:2 },
+    { num:7091, text:'Which of the following structures is a thread like projection where impulses travel?', options:['Synapse Junction','Cell Body (Soma)','Dendrites','Axon'], correctIndex:3 },
+    { num:7092, text:'Increased heart rate during exercise is brought about by which of the following?', options:['Sympathetic action of the somatic nervous system','Parasympathetic action of the autonomic nervous system','Sympathetic action of the autonomic nervous system','Parasympathetic action of the somatic nervous system'], correctIndex:2 },
+  ]},
+  { name: 'The Somatic Nervous System', questions: [
+    { num:7093, text:'Which part of the peripheral nervous system (PNS) controls voluntary muscular activity?', options:['Parasympathetic nerves','Sympathetic nerves','Somatic nerves','Autonomic nerves'], correctIndex:2 },
+    { num:7094, text:'Which statement describes a motor unit?', options:['A motor neuron that transmits information to the central nervous system','A sensory neuron that detects muscle movement','A group of muscles working together to create movement','A motor neuron and all the muscle fibres to which it connects'], correctIndex:3 },
+    { num:7095, text:'Which of the following best describes the process of motor unit recruitment?', options:['An efferent nerve impulse triggers all of the fibres in the motor unit to contract','An efferent nerve impulse triggers some of the fibres in the motor unit to contract','An afferent nerve impulse triggers all of the fibres in the motor unit to contract','An afferent nerve impulse triggers some of the fibres in the motor unit to contract'], correctIndex:0 },
+    { num:7096, text:'As the agonist contracts, the antagonist muscle relaxes to allow movement. This is called:', options:['Reciprocal inhibition','Passive innovation','Stretch reflex','Reverse stretch reflex'], correctIndex:0 },
+    { num:7097, text:'Muscle spindle cells function to detect excessive...', options:['Lengthening of a muscle','Contraction of a muscle','Heat within a muscle','Lactic acid within a muscle'], correctIndex:0 },
+    { num:7098, text:'The function of a Golgi Tendon Organ is to', options:['Sense the strength of a stretch','Sense the speed of a stretch','Sense changes in muscle tension','Sense changes in muscle size'], correctIndex:2 },
+    { num:7099, text:"Once the 'firing threshold' is met via nerve stimulation which of the following will occur?", options:['The reverse stretch reflex','The all or none response','The stretch reflex','Reciprocal inhibition'], correctIndex:1 },
+    { num:7100, text:'Which of the following is a neuromuscular adaptation associated with fitness training?', options:['Reduced frequency of nerve impulses to motor units','Reduced motor unit recruitment','Increased motor unit recruitment','Increased number of nerves'], correctIndex:2 },
+  ]},
+  { name: 'The Endocrine System', questions: [
+    { num:7101, text:'Which statement describes the endocrine system?', options:["It's made up of neurons that transmit information between different parts of the body","It's made up of glands that secrete hormones into the bloodstream to regulate the body","It is made up of bones which provide support and protection to major organs","It is made up of muscles which allow movement of different parts of the body"], correctIndex:1 },
+    { num:7102, text:"Which term means: 'maintaining balance within its normal range'?", options:['Homeostasis','Glycolysis','Hypertension','Metabolism'], correctIndex:0 },
+    { num:7103, text:'Which of the following options best describes the role of hormones in the body?', options:['Create slow responses at the site of production','Create fast responses at the site of production','Create slow responses away from the site of production','Create fast responses away from the site of production'], correctIndex:2 },
+    { num:7104, text:'The ovaries release hormones which:', options:['Promote muscle mass growth','Promote bone growth and development','Stimulate the breakdown of Glycogen to Glucose','Decrease hair growth on the body'], correctIndex:1 },
+    { num:7105, text:'Which reaction is caused by the release of adrenaline?', options:['Increased body fat deposits','Increased breathing rate','Decreased muscle mass','Decreased heart rate'], correctIndex:1 },
+    { num:7106, text:'Where in the body are catecholamines produced?', options:['Pancreas','Adrenal glands','Thyroid gland','Ovaries'], correctIndex:1 },
+    { num:7107, text:'Which hormone raises blood sugar levels by converting glycogen to glucose?', options:['Testosterone','Oestrogen','Glucagon','Insulin'], correctIndex:2 },
+    { num:7108, text:'Which of the following responses would be a positive effect of regular exercise on the endocrine system?', options:['Reduced insulin sensitivity at the muscles','Decreased testosterone and growth hormone','Increased sympathetic activity at rest','Reduced cortisol and adrenaline at rest'], correctIndex:3 },
+  ]},
+  { name: 'The Energy Systems', questions: [
+    { num:7109, text:'Which energy system relies on glucose / glycogen as its only fuel to create ATP?', options:['Phosphocreatine (ATP-PC)','Anaerobic Glycolysis (Lactic Acid)','Aerobic System','ATP Muscle stores'], correctIndex:1 },
+    { num:7110, text:'Which energy system produces zero by-products when creating ATP in the muscles?', options:['ATP Muscle Stores','Aerobic System','Phosphocreatine (ATP-PC)','Anaerobic Glycolysis (Lactic Acid)'], correctIndex:2 },
+    { num:7111, text:'What is pyruvic acid converted to when there is inadequate oxygen?', options:['Lactic acid','Creatine','Carbon dioxide','ATP'], correctIndex:0 },
+    { num:7112, text:'Which energy system would be predominant within slow twitch / oxidative muscle fibres?', options:['Aerobic System','Anaerobic Glycolysis (Lactic Acid)','ATP Muscle Stores','Phosphocreatine (ATP-PC)'], correctIndex:0 },
+    { num:7113, text:'Which type of activity would be most likely to use the phosphocreatine (ATP-PC) system?', options:['Walking','Sitting','Jumping','Jogging'], correctIndex:2 },
+    { num:7114, text:'Which by-product would be produced the most during low intensity/long duration exercise?', options:['Lactic Acid','Pyruvic Acid','Hydrogen','Carbon Dioxide'], correctIndex:3 },
+    { num:7115, text:'Which energy system would be most suited to exercise that is explosive, powerful, and fast?', options:['Anaerobic Glycolysis (Lactic Acid)','Phosphocreatine (ATP-PC)','Aerobic'], correctIndex:1 },
+    { num:7116, text:'As the intensity of an exercise is reduced, you increase the emphasis on which energy system?', options:['Phosphocreatine (ATP-PC)','Anaerobic Glycolysis (Lactic Acid)','Aerobic System','ATP Muscle stores'], correctIndex:2 },
+  ]},
+];
+
 function parseQuestions(raw) {
   const questions = [];
   const blocks = raw.split(/\n(?=Q\d+\.)/).map(b => b.trim()).filter(b => b);
@@ -2482,9 +2682,52 @@ function getTLHtml(tl) {
 function renderStartScreen() {
   const stats = loadStats();
   renderOverallStats(stats);
+  buildClassroomQuizGrid(stats);
   renderMockSection(stats);
   buildTopicGrid(stats);
   document.getElementById('clear-progress-wrap').style.display = 'block';
+}
+
+function buildClassroomQuizGrid(stats) {
+  const grid = document.getElementById('classroom-quiz-grid');
+  grid.innerHTML = '';
+  CLASSROOM_QUIZZES.forEach(quiz => {
+    const ts = stats.topics[quiz.name];
+    const tl = computeTrafficLight(ts);
+    const scoreClass = ts && ts.bestPct >= 80 ? 'passed' : ts && ts.bestPct >= 50 ? 'amber' : 'failed';
+    const scoreHTML = (!ts || ts.sessions === 0)
+      ? `<span class="topic-score not-started">Not started</span>`
+      : `<span class="topic-score ${scoreClass}">${ts.lastPct}% last &nbsp;·&nbsp; ${ts.bestPct}% best</span>`;
+    const btn = document.createElement('button');
+    btn.className = 'topic-btn';
+    btn.innerHTML = `${getTLHtml(tl)}<span class="topic-btn-name">${quiz.name}</span>${scoreHTML}<span class="count">${quiz.questions.length} Qs</span>`;
+    btn.onclick = () => startClassroomQuiz(quiz.name);
+    grid.appendChild(btn);
+  });
+}
+
+function startClassroomQuiz(name) {
+  const quiz = CLASSROOM_QUIZZES.find(q => q.name === name);
+  if (!quiz) return;
+  activeTopicName = name;
+  activeMockName = null;
+  initQuiz(quiz.questions);
+}
+
+function buildMuscleImageSection(stats) {
+  const section = document.getElementById('muscle-image-section');
+  section.innerHTML = '';
+  const ts = stats.topics['Name the Muscle'];
+  const tl = computeTrafficLight(ts);
+  const scoreClass = ts && ts.bestPct >= 80 ? 'passed' : ts && ts.bestPct >= 50 ? 'amber' : 'failed';
+  const scoreHTML = (!ts || ts.sessions === 0)
+    ? `<span class="topic-score not-started">Not started</span>`
+    : `<span class="topic-score ${scoreClass}">${ts.lastPct}% last &nbsp;·&nbsp; ${ts.bestPct}% best</span>`;
+  const btn = document.createElement('button');
+  btn.className = 'topic-btn';
+  btn.innerHTML = `${getTLHtml(tl)}<span class="topic-btn-name">Name the Muscle</span>${scoreHTML}<span class="count">${MUSCLE_IMAGE_QUESTIONS.length} muscles</span>`;
+  btn.onclick = () => startMuscleImageMode();
+  section.appendChild(btn);
 }
 
 function renderMockSection(stats) {
@@ -2583,6 +2826,12 @@ function startTopic(name) {
   initQuiz(filtered);
 }
 
+function startMuscleImageMode() {
+  activeTopicName = 'Name the Muscle';
+  activeMockName = null;
+  initQuiz(MUSCLE_IMAGE_QUESTIONS);
+}
+
 // ─── Quiz logic ───────────────────────────────────────────────────────────────
 function initQuiz(questionSet) {
   queue = shuffle([...questionSet]);
@@ -2643,7 +2892,16 @@ function showNextQuestion() {
 
   currentQ = q;
   document.getElementById('retry-meta').style.display = q._isRetry ? '' : 'none';
-  document.getElementById('q-text').textContent = q.text;
+  const qImg = document.getElementById('q-image');
+  if (q.imageUrl) {
+    qImg.src = q.imageUrl;
+    qImg.style.display = 'block';
+    document.getElementById('q-text').textContent = 'Name this muscle';
+  } else {
+    qImg.src = '';
+    qImg.style.display = 'none';
+    document.getElementById('q-text').textContent = q.text;
+  }
 
   const container = document.getElementById('options-container');
   container.innerHTML = '';
@@ -2688,7 +2946,7 @@ function selectAnswer(origIdx) {
     showFeedback(false, 'The correct answer was: ' + String.fromCharCode(97 + correctPos) + ') ' + q.options[q.correctIndex]);
     // Guard: cap each question at 2 retries per session
     const retryCount = retryAttempts[q.num] || 0;
-    if (retryCount < 2) {
+    if (retryCount < 1) {
       retryPool.push(Object.assign({}, q, { _isRetry: true }));
       retryAttempts[q.num] = retryCount + 1;
     }

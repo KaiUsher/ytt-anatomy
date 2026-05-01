@@ -1,4 +1,4 @@
-const CACHE = 'ytt-anatomy-v2';
+const CACHE = 'ytt-anatomy-v3';
 const ASSETS = [
   '/ytt-anatomy/',
   '/ytt-anatomy/index.html',
