@@ -2729,7 +2729,8 @@ function startClassroomQuiz(name) {
   if (!quiz) return;
   activeTopicName = 'cq:' + name;
   activeMockName = null;
-  initQuiz(quiz.questions);
+  const qs = quiz.questions.map(q => Object.assign({}, q, { topic: 'cq:' + name }));
+  initQuiz(qs);
   document.getElementById('quiz-title').textContent = name;
 }
 
