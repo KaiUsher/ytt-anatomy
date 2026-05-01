@@ -2692,7 +2692,7 @@ function buildClassroomQuizGrid(stats) {
   const grid = document.getElementById('classroom-quiz-grid');
   grid.innerHTML = '';
   CLASSROOM_QUIZZES.forEach(quiz => {
-    const ts = stats.topics[quiz.name];
+    const ts = stats.topics['cq:' + quiz.name];
     const tl = computeTrafficLight(ts);
     const scoreClass = ts && ts.bestPct >= 80 ? 'passed' : ts && ts.bestPct >= 50 ? 'amber' : 'failed';
     const scoreHTML = (!ts || ts.sessions === 0)
@@ -2709,9 +2709,10 @@ function buildClassroomQuizGrid(stats) {
 function startClassroomQuiz(name) {
   const quiz = CLASSROOM_QUIZZES.find(q => q.name === name);
   if (!quiz) return;
-  activeTopicName = name;
+  activeTopicName = 'cq:' + name;
   activeMockName = null;
   initQuiz(quiz.questions);
+  document.getElementById('quiz-title').textContent = name;
 }
 
 function buildMuscleImageSection(stats) {
